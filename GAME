@@ -3,23 +3,21 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>최상단 INDEX · 웹앱 허브 (라이트 테마)</title>
-  <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
+  <title>INDEX · 코인 대시 &amp; 장애물 회피</title>
   <style>
     :root {
-      --bg: #f4f6f9;
-      --surface: #ffffff;
-      --surface-2: #f8fafc;
-      --text: #0f172a;
-      --muted: #475569;
-      --accent: #0284c7;
-      --accent-hover: #0369a1;
-      --accent-soft: #e0f2fe;
-      --success: #15803d;
-      --error: #dc2626;
-      --border: #e2e8f0;
-      --shadow: 0 4px 16px rgba(15, 23, 42, 0.05);
+      --bg: #090e1a;
+      --surface: #121b30;
+      --surface-2: #1a2744;
+      --text: #f8fafc;
+      --muted: #94a3b8;
+      --accent: #38bdf8;
+      --accent-hover: #0ea5e9;
+      --coin: #fbbf24;
+      --hazard: #fb7185;
+      --player: #34d399;
+      --dash: #a78bfa;
+      --border: #2a3c63;
       --radius: 14px;
     }
 
@@ -27,188 +25,176 @@
       box-sizing: border-box;
       margin: 0;
       padding: 0;
-    }
-
-    html {
-      scroll-behavior: smooth;
+      user-select: none;
     }
 
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans KR", sans-serif;
-      background: var(--bg);
+      background: radial-gradient(circle at top, #162340 0%, var(--bg) 62%);
       color: var(--text);
-      line-height: 1.6;
-      padding: 24px 16px 60px;
+      min-height: 100vh;
+      padding: 20px 14px 48px;
+      line-height: 1.5;
     }
 
     .app {
-      max-width: 920px;
+      max-width: 820px;
       margin: 0 auto;
       display: grid;
-      gap: 20px;
+      gap: 16px;
     }
 
     .card {
       background: var(--surface);
       border: 1px solid var(--border);
       border-radius: var(--radius);
-      padding: 22px;
-      box-shadow: var(--shadow);
+      padding: 18px 20px;
+      box-shadow: 0 10px 28px rgba(0, 0, 0, 0.3);
     }
 
-    /* [00] 최상단 INDEX 헤더 */
-    .index-header {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: space-between;
-      align-items: flex-start;
-      gap: 14px;
-      margin-bottom: 16px;
-    }
-
-    .index-title {
-      font-size: 1.5rem;
+    .game-title {
+      font-size: 1.4rem;
       font-weight: 800;
       letter-spacing: -0.02em;
-      color: var(--text);
     }
 
-    .index-sub {
+    .game-sub {
+      font-size: 0.88rem;
       color: var(--muted);
-      font-size: 0.92rem;
-      margin-top: 4px;
+      margin-top: 2px;
     }
 
-    .badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      font-size: 0.78rem;
-      font-weight: 700;
-      color: var(--accent-hover);
-      background: var(--accent-soft);
-      border: 1px solid #bae6fd;
-      padding: 6px 11px;
-      border-radius: 999px;
-    }
-
-    .quick-nav {
+    .index-nav {
       display: flex;
       flex-wrap: wrap;
       gap: 8px;
-      margin-bottom: 18px;
+      margin-top: 12px;
     }
 
-    .quick-nav a {
+    .index-nav a {
       text-decoration: none;
-      color: var(--text);
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--muted);
       background: var(--surface-2);
       border: 1px solid var(--border);
-      padding: 6px 12px;
+      padding: 5px 10px;
       border-radius: 8px;
-      font-size: 0.84rem;
-      font-weight: 600;
-      transition: border-color 0.18s ease, color 0.18s ease, background 0.18s ease;
+      transition: color 0.15s ease, border-color 0.15s ease;
     }
 
-    .quick-nav a:hover {
-      border-color: var(--accent);
+    .index-nav a:hover {
       color: var(--accent);
-      background: var(--accent-soft);
-    }
-
-    .search-row {
-      margin-bottom: 16px;
-    }
-
-    input[type="search"],
-    input[type="url"],
-    input[type="text"],
-    textarea {
-      width: 100%;
-      padding: 11px 14px;
-      border-radius: 10px;
-      border: 1px solid var(--border);
-      background: var(--surface-2);
-      color: var(--text);
-      font-size: 0.94rem;
-      outline: none;
-      font-family: inherit;
-      transition: border-color 0.15s ease, box-shadow 0.15s ease;
-    }
-
-    input:focus,
-    textarea:focus {
       border-color: var(--accent);
-      background: var(--surface);
-      box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.12);
     }
 
-    /* INDEX 모듈 카드 그리드 */
-    .index-grid {
+    .hud-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-      gap: 12px;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
     }
 
-    .index-item {
+    @media (max-width: 640px) {
+      .hud-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    .hud-box {
       background: var(--surface-2);
       border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 14px;
+      border-radius: 10px;
+      padding: 10px 12px;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      gap: 10px;
-      transition: transform 0.15s ease, border-color 0.18s ease, box-shadow 0.18s ease;
+      gap: 6px;
     }
 
-    .index-item:hover {
-      transform: translateY(-2px);
-      border-color: var(--accent);
-      background: var(--surface);
-      box-shadow: 0 6px 18px rgba(2, 132, 199, 0.08);
-    }
-
-    .index-item-code {
-      font-size: 0.76rem;
+    .hud-label {
+      font-size: 0.74rem;
+      color: var(--muted);
       font-weight: 700;
-      color: var(--accent);
+    }
+
+    .hud-val {
+      font-size: 1.2rem;
+      font-weight: 800;
       font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
     }
 
-    .index-item-title {
-      font-size: 1rem;
-      font-weight: 700;
-      margin-top: 2px;
-      color: var(--text);
+    .hud-val.accent { color: var(--accent); }
+    .hud-val.coin { color: var(--coin); }
+    .hud-val.hazard { color: var(--hazard); }
+    .hud-val.dash { color: var(--dash); }
+
+    .cooldown-track {
+      width: 100%;
+      height: 8px;
+      background: #0b1120;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      overflow: hidden;
     }
 
-    .index-item-desc {
-      font-size: 0.85rem;
+    .cooldown-fill {
+      height: 100%;
+      width: 100%;
+      background: linear-gradient(90deg, #8b5cf6, #38bdf8);
+      border-radius: 999px;
+      transition: width 0.05s linear;
+    }
+
+    .cooldown-fill.cooling {
+      background: #64748b;
+    }
+
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .diff-group {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+    }
+
+    .diff-btn {
+      background: var(--surface-2);
       color: var(--muted);
-      margin-top: 4px;
+      border: 1px solid var(--border);
+      padding: 6px 11px;
+      border-radius: 8px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      cursor: pointer;
     }
 
-    .index-item-actions {
+    .diff-btn.active {
+      background: rgba(56, 189, 248, 0.16);
+      color: var(--accent);
+      border-color: var(--accent);
+    }
+
+    .action-group {
       display: flex;
       gap: 8px;
-      margin-top: 4px;
     }
 
     .btn {
       background: var(--accent);
-      color: #ffffff;
+      color: #061322;
       border: none;
-      padding: 9px 14px;
-      border-radius: 8px;
-      font-weight: 700;
+      padding: 8px 15px;
+      border-radius: 9px;
       font-size: 0.86rem;
+      font-weight: 800;
       cursor: pointer;
-      text-decoration: none;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
       transition: background 0.15s ease;
     }
 
@@ -221,567 +207,736 @@
       cursor: not-allowed;
     }
 
-    .btn-sm {
-      padding: 6px 11px;
-      font-size: 0.8rem;
-    }
-
-    .btn-secondary {
-      background: var(--surface);
+    .btn-ghost {
+      background: var(--surface-2);
       color: var(--text);
       border: 1px solid var(--border);
     }
 
-    .btn-secondary:hover:not(:disabled) {
+    .btn-ghost:hover:not(:disabled) {
       border-color: var(--accent);
-      color: var(--accent);
-      background: var(--surface-2);
     }
 
-    /* 섹션 공통 */
-    .section-head {
+    .stage-wrap {
+      position: relative;
+      width: 100%;
+      height: 420px;
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      background: #070b14;
+    }
+
+    canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+
+    .key-hint {
+      margin-top: 10px;
       display: flex;
       flex-wrap: wrap;
       justify-content: space-between;
-      align-items: center;
       gap: 8px;
-      margin-bottom: 14px;
-      padding-bottom: 10px;
-      border-bottom: 1px solid var(--border);
-    }
-
-    .section-code {
-      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
       font-size: 0.82rem;
-      color: var(--accent);
-      font-weight: 700;
-    }
-
-    h2 {
-      font-size: 1.18rem;
-      color: var(--text);
-    }
-
-    .desc {
       color: var(--muted);
-      font-size: 0.9rem;
-      margin-bottom: 14px;
     }
 
-    label {
-      display: block;
-      font-size: 0.88rem;
-      font-weight: 600;
-      margin-bottom: 6px;
-      color: var(--text);
-    }
-
-    .controls-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      margin-top: 12px;
-      align-items: center;
-    }
-
-    .qr-preview-box {
-      margin-top: 16px;
+    kbd {
       background: var(--surface-2);
       border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 20px;
-      min-height: 230px;
+      border-radius: 5px;
+      padding: 1px 6px;
+      font-size: 0.78rem;
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: var(--text);
+    }
+
+    .overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(7, 11, 20, 0.84);
+      backdrop-filter: blur(3px);
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      gap: 12px;
-    }
-
-    #qrCodeContainer {
-      background: #ffffff;
-      padding: 14px;
-      border-radius: 10px;
-      border: 1px solid var(--border);
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .placeholder-text {
-      color: var(--muted);
-      font-size: 0.9rem;
       text-align: center;
+      padding: 20px;
+      gap: 10px;
     }
 
-    .dropzone {
-      border: 2px dashed #cbd5e1;
-      border-radius: 12px;
-      padding: 24px 16px;
-      text-align: center;
-      background: var(--surface-2);
-      cursor: pointer;
-      transition: border-color 0.18s ease, background 0.18s ease;
-    }
-
-    .dropzone:hover,
-    .dropzone.dragover {
-      border-color: var(--accent);
-      background: var(--accent-soft);
-    }
-
-    .dropzone p {
-      color: var(--muted);
-      font-size: 0.9rem;
-    }
-
-    .dropzone strong {
-      color: var(--accent-hover);
-    }
-
-    #fileInput {
+    .overlay.hidden {
       display: none;
     }
 
-    .uploaded-preview-wrap {
-      margin-top: 14px;
-      display: none;
-      justify-content: center;
-      background: var(--surface-2);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 12px;
+    .overlay h2 {
+      font-size: 1.45rem;
+      font-weight: 800;
     }
 
-    .uploaded-preview-wrap.visible {
-      display: flex;
-    }
-
-    #uploadedPreview {
-      max-width: 100%;
-      max-height: 220px;
-      border-radius: 8px;
-      object-fit: contain;
-    }
-
-    .result-box {
-      margin-top: 14px;
-      background: var(--surface-2);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 14px;
-    }
-
-    .result-status {
-      font-size: 0.85rem;
-      font-weight: 700;
-      margin-bottom: 6px;
+    .overlay p {
       color: var(--muted);
+      font-size: 0.92rem;
+      max-width: 420px;
     }
 
-    .result-status.ok {
-      color: var(--success);
-    }
-
-    .result-status.err {
-      color: var(--error);
-    }
-
-    .decoded-link {
-      word-break: break-all;
+    .final-score {
+      font-size: 1.8rem;
+      font-weight: 900;
+      color: var(--coin);
       font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-      font-size: 0.9rem;
-      color: var(--accent-hover);
-      text-decoration: none;
-      font-weight: 600;
     }
 
-    .decoded-link:hover {
-      text-decoration: underline;
+    h3 {
+      font-size: 1rem;
+      margin-bottom: 8px;
     }
 
-    .guide-list {
+    .rules {
       padding-left: 18px;
       color: var(--muted);
-      font-size: 0.9rem;
+      font-size: 0.88rem;
       display: grid;
-      gap: 8px;
+      gap: 5px;
     }
 
-    .guide-list code {
+    .rules code {
       color: var(--text);
       background: var(--surface-2);
-      border: 1px solid var(--border);
-      padding: 2px 6px;
+      padding: 1px 6px;
       border-radius: 5px;
-    }
-
-    .save-note {
-      font-size: 0.82rem;
-      color: var(--muted);
     }
   </style>
 </head>
 <body>
   <main class="app">
-    <!-- [00] 최상단 INDEX 허브 -->
     <header id="top-index" class="card">
-      <div class="index-header">
-        <div>
-          <h1 class="index-title">INDEX · 개인 웹앱 허브</h1>
-          <p class="index-sub">GitHub Pages 단일 파일 배포용 최상단 인덱스 — 원하는 기능으로 바로 이동하거나 검색하세요.</p>
-        </div>
-        <span class="badge">Light Mode · index.html</span>
-      </div>
-
-      <nav class="quick-nav" aria-label="최상단 인덱스 바로가기">
+      <h1 class="game-title">INDEX · 코인 대시 &amp; 장애물 회피</h1>
+      <p class="game-sub">방향키/WASD로 이동하고 Shift 또는 Space로 순간 대시해 장애물을 피하며 코인을 모으세요.</p>
+      <nav class="index-nav" aria-label="게임 섹션 인덱스">
         <a href="#top-index">[00] 최상단 INDEX</a>
-        <a href="#module-qr-gen">[01] QR 생성</a>
-        <a href="#module-qr-read">[02] QR 읽기</a>
-        <a href="#module-notes">[03] 퀵 메모</a>
-        <a href="#deploy-guide">[04] GitHub 배포</a>
+        <a href="#game-hud">[01] HUD</a>
+        <a href="#game-stage">[02] 게임 스테이지</a>
+        <a href="#game-guide">[03] 규칙 및 배포</a>
       </nav>
-
-      <div class="search-row">
-        <label for="indexSearch">INDEX 모듈 검색</label>
-        <input
-          id="indexSearch"
-          type="search"
-          placeholder="예: QR, 생성, 읽기, 메모, 배포..."
-          autocomplete="off"
-        />
-      </div>
-
-      <div id="indexGrid" class="index-grid">
-        <article class="index-item" data-keywords="01 qr 생성 링크 url png 다운로드">
-          <div>
-            <div class="index-item-code">INDEX-01</div>
-            <div class="index-item-title">QR 코드 자동 생성</div>
-            <p class="index-item-desc">링크를 입력하면 QR 코드를 즉시 만들고 PNG로 저장합니다.</p>
-          </div>
-          <div class="index-item-actions">
-            <a class="btn btn-sm" href="#module-qr-gen">열기</a>
-          </div>
-        </article>
-
-        <article class="index-item" data-keywords="02 qr 읽기 이미지 업로드 링크 추출 복사">
-          <div>
-            <div class="index-item-code">INDEX-02</div>
-            <div class="index-item-title">QR 이미지 판독</div>
-            <p class="index-item-desc">이미지를 업로드해 QR 코드 속 링크를 읽고 복사합니다.</p>
-          </div>
-          <div class="index-item-actions">
-            <a class="btn btn-sm" href="#module-qr-read">열기</a>
-          </div>
-        </article>
-
-        <article class="index-item" data-keywords="03 메모 노트 기록 저장">
-          <div>
-            <div class="index-item-code">INDEX-03</div>
-            <div class="index-item-title">퀵 메모장</div>
-            <p class="index-item-desc">아이디어와 작업 메모를 브라우저 저장소에 보관합니다.</p>
-          </div>
-          <div class="index-item-actions">
-            <a class="btn btn-sm" href="#module-notes">열기</a>
-          </div>
-        </article>
-
-        <article class="index-item" data-keywords="04 깃허브 github pages 배포 업로드">
-          <div>
-            <div class="index-item-code">INDEX-04</div>
-            <div class="index-item-title">GitHub Pages 배포</div>
-            <p class="index-item-desc">저장소에 index.html을 올리고 웹 주소로 공개하는 절차입니다.</p>
-          </div>
-          <div class="index-item-actions">
-            <a class="btn btn-sm btn-secondary" href="#deploy-guide">가이드 보기</a>
-          </div>
-        </article>
-      </div>
     </header>
 
-    <!-- [01] QR 생성 -->
-    <section id="module-qr-gen" class="card">
-      <div class="section-head">
-        <h2>QR 코드 자동 생성</h2>
-        <span class="section-code">INDEX-01 · #module-qr-gen</span>
-      </div>
-      <p class="desc">링크(URL) 또는 텍스트를 입력하면 QR 코드가 자동으로 생성됩니다.</p>
-
-      <label for="linkInput">링크(URL) 입력</label>
-      <input id="linkInput" type="url" placeholder="예: https://github.com" autocomplete="off" />
-
-      <div class="controls-row">
-        <button id="downloadQrBtn" class="btn" type="button" disabled>PNG 다운로드</button>
-        <button id="clearQrBtn" class="btn btn-secondary" type="button">초기화</button>
-        <a class="btn btn-secondary" href="#top-index">최상단 INDEX로</a>
-      </div>
-
-      <div class="qr-preview-box">
-        <div id="qrCodeContainer" style="display: none;"></div>
-        <p id="qrPlaceholder" class="placeholder-text">링크를 입력하면 여기에 QR 코드가 표시됩니다.</p>
-      </div>
-    </section>
-
-    <!-- [02] QR 읽기 -->
-    <section id="module-qr-read" class="card">
-      <div class="section-head">
-        <h2>이미지 업로드로 QR 링크 확인</h2>
-        <span class="section-code">INDEX-02 · #module-qr-read</span>
-      </div>
-      <p class="desc">QR 코드 이미지를 선택하거나 끌어다 놓으면 포함된 링크를 보여줍니다.</p>
-
-      <div id="dropzone" class="dropzone" tabindex="0" role="button" aria-label="QR 이미지 업로드">
-        <p><strong>이미지를 클릭해 선택</strong>하거나 여기에 드래그하세요 (PNG, JPG, WEBP)</p>
-      </div>
-      <input id="fileInput" type="file" accept="image/*" />
-
-      <div id="uploadedPreviewWrap" class="uploaded-preview-wrap">
-        <img id="uploadedPreview" alt="업로드된 QR 이미지" />
-      </div>
-
-      <div class="result-box">
-        <div id="readStatus" class="result-status">대기 중 · 이미지를 업로드해 주세요.</div>
-        <div id="decodedOutput">
-          <span class="placeholder-text">추출된 링크가 여기에 표시됩니다.</span>
+    <section id="game-hud" class="card" aria-label="점수 및 상태">
+      <div class="hud-grid">
+        <div class="hud-box">
+          <div class="hud-label">SCORE</div>
+          <div id="hudScore" class="hud-val accent">0</div>
         </div>
-        <div class="controls-row">
-          <button id="copyDecodedBtn" class="btn btn-secondary" type="button" disabled>링크 복사</button>
-          <a id="openDecodedLink" class="btn" href="#" target="_blank" rel="noopener noreferrer" style="display: none;">링크 열기</a>
-          <a class="btn btn-secondary" href="#top-index">최상단 INDEX로</a>
+        <div class="hud-box">
+          <div class="hud-label">COINS</div>
+          <div id="hudCoins" class="hud-val coin">0</div>
+        </div>
+        <div class="hud-box">
+          <div class="hud-label">SPEED LV</div>
+          <div id="hudLevel" class="hud-val hazard">Lv.1</div>
+        </div>
+        <div class="hud-box">
+          <div>
+            <div class="hud-label">DASH COOLDOWN</div>
+            <div id="hudDashText" class="hud-val dash">READY</div>
+          </div>
+          <div class="cooldown-track" aria-label="대시 쿨다운 게이지">
+            <div id="hudDashBar" class="cooldown-fill"></div>
+          </div>
         </div>
       </div>
     </section>
 
-    <!-- [03] 퀵 메모 -->
-    <section id="module-notes" class="card">
-      <div class="section-head">
-        <h2>퀵 메모장</h2>
-        <span class="section-code">INDEX-03 · #module-notes</span>
+    <section id="game-stage" class="card">
+      <div class="toolbar">
+        <div class="diff-group" role="group" aria-label="난이도 선택">
+          <button class="diff-btn active" data-diff="normal" type="button">보통</button>
+          <button class="diff-btn" data-diff="fast" type="button">빠름</button>
+          <button class="diff-btn" data-diff="hyper" type="button">초고속</button>
+        </div>
+        <div class="action-group">
+          <button id="pauseBtn" class="btn btn-ghost" type="button" disabled>일시정지</button>
+          <button id="restartBtn" class="btn btn-ghost" type="button">재시작</button>
+        </div>
       </div>
-      <p class="desc">다음에 추가할 기능 아이디어나 메모를 적어두세요. (브라우저 localStorage에 자동 저장)</p>
 
-      <label for="quickNoteArea">작업 메모</label>
-      <textarea id="quickNoteArea" rows="4" placeholder="예: 다음 기능으로 색상 커스텀 QR 옵션 추가하기"></textarea>
+      <div class="stage-wrap">
+        <canvas id="gameCanvas"></canvas>
 
-      <div class="controls-row">
-        <button id="saveNoteBtn" class="btn" type="button">메모 저장</button>
-        <button id="clearNoteBtn" class="btn btn-secondary" type="button">메모 비우기</button>
-        <span id="noteSaveStatus" class="save-note"></span>
+        <div id="startOverlay" class="overlay">
+          <h2>코인 대시 준비 완료</h2>
+          <p><kbd>WASD</kbd> 또는 <kbd>방향키</kbd>로 이동하고, <kbd>Shift</kbd> 또는 <kbd>Space</kbd>로 순간 대시하여 장애물을 피하세요.</p>
+          <button id="startBtn" class="btn" type="button">게임 시작</button>
+        </div>
+
+        <div id="pauseOverlay" class="overlay hidden">
+          <h2>일시정지</h2>
+          <p>계속하려면 아래 버튼을 누르세요.</p>
+          <button id="resumeBtn" class="btn" type="button">계속하기</button>
+        </div>
+
+        <div id="overOverlay" class="overlay hidden">
+          <h2>충돌! 게임 오버</h2>
+          <div id="finalScoreText" class="final-score">0점</div>
+          <p id="overSummary">획득 코인 0개 · 생존 시간 0.0초</p>
+          <button id="playAgainBtn" class="btn" type="button">다시 플레이</button>
+        </div>
+      </div>
+
+      <div class="key-hint">
+        <span>이동: <kbd>WASD</kbd> / <kbd>방향키</kbd> · 순간 대시: <kbd>Shift</kbd> / <kbd>Space</kbd></span>
+        <span>일시정지: <kbd>P</kbd> / <kbd>Esc</kbd></span>
       </div>
     </section>
 
-    <!-- [04] GitHub Pages 배포 안내 -->
-    <footer id="deploy-guide" class="card">
-      <div class="section-head">
-        <h2>GitHub Pages 배포 절차</h2>
-        <span class="section-code">INDEX-04 · #deploy-guide</span>
-      </div>
-      <ol class="guide-list">
-        <li>GitHub에서 새 저장소(예: <code>my-web-index</code>)를 생성합니다.</li>
-        <li>이 코드를 <code>index.html</code> 파일로 저장한 뒤 저장소 루트에 업로드(<code>Add file &gt; Upload files</code>)합니다.</li>
-        <li>저장소의 <strong>Settings &gt; Pages</strong> 메뉴에서 <strong>Branch</strong>를 <code>main</code>, 폴더를 <code>/ (root)</code>로 선택하고 저장합니다.</li>
-        <li>잠시 후 <code>https://&lt;사용자명&gt;.github.io/&lt;저장소명&gt;/</code> 주소로 접속하면 최상단 INDEX가 열립니다.</li>
-      </ol>
+    <footer id="game-guide" class="card">
+      <h3>대시 스킬, 조작법 및 GitHub Pages 배포</h3>
+      <ul class="rules">
+        <li><strong>순간 대시(<code>Shift</code> / <code>Space</code>):</strong> 입력 방향으로 약 <code>115px</code> 짧게 순간 이동하며, 대시 직후 <code>0.28초</code> 동안 <strong>무적 상태</strong>가 되어 장애물을 통과할 수 있습니다.</li>
+        <li><strong>쿨다운 게이지:</strong> 대시 재사용 대기시간은 <code>1.8초</code>이며, HUD 게이지가 100% 차오르면 다시 사용할 수 있습니다.</li>
+        <li><strong>404 방지 팁:</strong> 저장소 루트에 <code>index.html</code>(소문자)로 업로드하거나, 하위 폴더에 둘 경우 해당 폴더 경로(예: <code>./GAME/index.html</code>)가 실제 파일 위치와 일치해야 합니다.</li>
+      </ul>
     </footer>
   </main>
 
-  <canvas id="decodeCanvas" style="display: none;"></canvas>
-
   <script>
-    // [00] 최상단 INDEX 검색 필터
-    const indexSearch = document.getElementById("indexSearch");
-    const indexItems = Array.from(document.querySelectorAll("#indexGrid .index-item"));
-
-    indexSearch.addEventListener("input", (e) => {
-      const q = e.target.value.trim().toLowerCase();
-      indexItems.forEach((item) => {
-        const text = (item.textContent + " " + (item.dataset.keywords || "")).toLowerCase();
-        item.style.display = !q || text.includes(q) ? "flex" : "none";
-      });
-    });
-
-    // [01] QR 코드 자동 생성
-    const linkInput = document.getElementById("linkInput");
-    const qrCodeContainer = document.getElementById("qrCodeContainer");
-    const qrPlaceholder = document.getElementById("qrPlaceholder");
-    const downloadQrBtn = document.getElementById("downloadQrBtn");
-    const clearQrBtn = document.getElementById("clearQrBtn");
-
-    function renderQRCode(rawValue) {
-      const value = rawValue.trim();
-      qrCodeContainer.innerHTML = "";
-
-      if (!value) {
-        qrCodeContainer.style.display = "none";
-        qrPlaceholder.style.display = "block";
-        downloadQrBtn.disabled = true;
-        return;
+    const DIFF_CONFIG = {
+      normal: {
+        playerSpeed: 290,
+        hazardSpeedMin: 145,
+        hazardSpeedMax: 235,
+        hazardInterval: 760,
+        coinInterval: 950,
+        scoreMult: 1.0
+      },
+      fast: {
+        playerSpeed: 325,
+        hazardSpeedMin: 200,
+        hazardSpeedMax: 315,
+        hazardInterval: 540,
+        coinInterval: 850,
+        scoreMult: 1.3
+      },
+      hyper: {
+        playerSpeed: 360,
+        hazardSpeedMin: 265,
+        hazardSpeedMax: 400,
+        hazardInterval: 390,
+        coinInterval: 780,
+        scoreMult: 1.6
       }
+    };
 
-      qrPlaceholder.style.display = "none";
-      qrCodeContainer.style.display = "inline-flex";
+    const DASH_DISTANCE = 115;
+    const DASH_COOLDOWN = 1.8;
+    const DASH_INVULN_DURATION = 0.28;
+    const BEST_KEY = "coin_dodge_arcade_best_v1";
 
-      new QRCode(qrCodeContainer, {
-        text: value,
-        width: 196,
-        height: 196,
-        colorDark: "#0f172a",
-        colorLight: "#ffffff",
-        correctLevel: QRCode.CorrectLevel.M
-      });
-
-      downloadQrBtn.disabled = false;
-    }
-
-    linkInput.addEventListener("input", (e) => renderQRCode(e.target.value));
-
-    clearQrBtn.addEventListener("click", () => {
-      linkInput.value = "";
-      renderQRCode("");
-      linkInput.focus();
-    });
-
-    downloadQrBtn.addEventListener("click", () => {
-      const canvas = qrCodeContainer.querySelector("canvas");
-      const img = qrCodeContainer.querySelector("img");
-      const dataUrl = canvas ? canvas.toDataURL("image/png") : (img && img.src ? img.src : "");
-      if (!dataUrl) return;
-      const a = document.createElement("a");
-      a.href = dataUrl;
-      a.download = "qrcode.png";
-      a.click();
-    });
-
-    // [02] 이미지 업로드로 QR 링크 확인
-    const dropzone = document.getElementById("dropzone");
-    const fileInput = document.getElementById("fileInput");
-    const uploadedPreviewWrap = document.getElementById("uploadedPreviewWrap");
-    const uploadedPreview = document.getElementById("uploadedPreview");
-    const decodeCanvas = document.getElementById("decodeCanvas");
-    const readStatus = document.getElementById("readStatus");
-    const decodedOutput = document.getElementById("decodedOutput");
-    const copyDecodedBtn = document.getElementById("copyDecodedBtn");
-    const openDecodedLink = document.getElementById("openDecodedLink");
-    let currentDecodedText = "";
-
-    function isValidHttpUrl(text) {
+    function loadBestScore() {
       try {
-        const parsed = new URL(text);
-        return parsed.protocol === "http:" || parsed.protocol === "https:";
+        return Number(localStorage.getItem(BEST_KEY) || "0") || 0;
       } catch {
-        return false;
+        return 0;
       }
     }
 
-    function decodeImageFile(file) {
-      if (!file || !file.type.startsWith("image/")) {
-        readStatus.textContent = "오류 · 이미지 파일만 지원합니다.";
-        readStatus.className = "result-status err";
-        return;
+    function saveBestScore(value) {
+      try {
+        localStorage.setItem(BEST_KEY, String(value));
+      } catch {
+        // 스토리지 제한 환경 무시
       }
-
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        const img = new Image();
-        img.onload = () => {
-          uploadedPreview.src = event.target.result;
-          uploadedPreviewWrap.classList.add("visible");
-
-          const ctx = decodeCanvas.getContext("2d", { willReadFrequently: true });
-          decodeCanvas.width = img.naturalWidth;
-          decodeCanvas.height = img.naturalHeight;
-          ctx.drawImage(img, 0, 0);
-
-          const imageData = ctx.getImageData(0, 0, decodeCanvas.width, decodeCanvas.height);
-          const code = jsQR(imageData.data, imageData.width, imageData.height, {
-            inversionAttempts: "attemptBoth"
-          });
-
-          if (code && code.data) {
-            currentDecodedText = code.data;
-            readStatus.textContent = "인식 성공 · QR 코드에서 링크를 추출했습니다.";
-            readStatus.className = "result-status ok";
-
-            if (isValidHttpUrl(currentDecodedText)) {
-              decodedOutput.innerHTML = `<a class="decoded-link" href="${encodeURI(currentDecodedText)}" target="_blank" rel="noopener noreferrer">${currentDecodedText}</a>`;
-              openDecodedLink.href = encodeURI(currentDecodedText);
-              openDecodedLink.style.display = "inline-flex";
-            } else {
-              decodedOutput.innerHTML = `<span class="decoded-link">${currentDecodedText}</span>`;
-              openDecodedLink.style.display = "none";
-            }
-            copyDecodedBtn.disabled = false;
-          } else {
-            currentDecodedText = "";
-            readStatus.textContent = "인식 실패 · 이미지에서 QR 코드를 찾지 못했습니다.";
-            readStatus.className = "result-status err";
-            decodedOutput.innerHTML = `<span class="placeholder-text">추출된 링크가 없습니다.</span>`;
-            copyDecodedBtn.disabled = true;
-            openDecodedLink.style.display = "none";
-          }
-        };
-        img.src = event.target.result;
-      };
-      reader.readAsDataURL(file);
     }
 
-    dropzone.addEventListener("click", () => fileInput.click());
-    dropzone.addEventListener("keydown", (e) => {
-      if (e.key === "Enter" || e.key === " ") {
+    const canvas = document.getElementById("gameCanvas");
+    const ctx = canvas.getContext("2d");
+
+    const hudScore = document.getElementById("hudScore");
+    const hudCoins = document.getElementById("hudCoins");
+    const hudLevel = document.getElementById("hudLevel");
+    const hudDashText = document.getElementById("hudDashText");
+    const hudDashBar = document.getElementById("hudDashBar");
+
+    const startOverlay = document.getElementById("startOverlay");
+    const pauseOverlay = document.getElementById("pauseOverlay");
+    const overOverlay = document.getElementById("overOverlay");
+    const finalScoreText = document.getElementById("finalScoreText");
+    const overSummary = document.getElementById("overSummary");
+
+    const startBtn = document.getElementById("startBtn");
+    const pauseBtn = document.getElementById("pauseBtn");
+    const resumeBtn = document.getElementById("resumeBtn");
+    const restartBtn = document.getElementById("restartBtn");
+    const playAgainBtn = document.getElementById("playAgainBtn");
+    const diffBtns = Array.from(document.querySelectorAll(".diff-btn"));
+
+    let difficulty = "normal";
+    let state = "idle";
+    let score = 0;
+    let coinsCollected = 0;
+    let surviveTime = 0;
+    let speedLevel = 1;
+    let bestScore = loadBestScore();
+
+    let dashCooldownLeft = 0;
+    let dashInvulnLeft = 0;
+
+    const keys = new Set();
+    const player = { x: 0, y: 0, radius: 15, lastDirX: 0, lastDirY: -1 };
+    let hazards = [];
+    let coins = [];
+    let popups = [];
+    let afterimages = [];
+    let hazardTimer = 0;
+    let coinTimer = 0;
+    let survivalScoreAcc = 0;
+    let lastFrameTime = 0;
+
+    function clampPlayer() {
+      const w = canvas.clientWidth;
+      const h = canvas.clientHeight;
+      const pad = player.radius + 6;
+      player.x = Math.max(pad, Math.min(w - pad, player.x));
+      player.y = Math.max(pad, Math.min(h - pad, player.y));
+    }
+
+    function resizeCanvas() {
+      const rect = canvas.parentElement.getBoundingClientRect();
+      const dpr = window.devicePixelRatio || 1;
+      canvas.width = Math.max(1, Math.floor(rect.width * dpr));
+      canvas.height = Math.max(1, Math.floor(rect.height * dpr));
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+      if (state === "idle") {
+        player.x = canvas.clientWidth * 0.5;
+        player.y = canvas.clientHeight * 0.78;
+      } else {
+        clampPlayer();
+      }
+    }
+
+    function updateHud() {
+      hudScore.textContent = Math.floor(score).toLocaleString("ko-KR");
+      hudCoins.textContent = coinsCollected.toLocaleString("ko-KR");
+      hudLevel.textContent = `Lv.${speedLevel}`;
+
+      if (dashCooldownLeft <= 0) {
+        hudDashText.textContent = "READY";
+        hudDashBar.style.width = "100%";
+        hudDashBar.classList.remove("cooling");
+      } else {
+        hudDashText.textContent = `${dashCooldownLeft.toFixed(1)}s`;
+        const progress = Math.max(0, Math.min(100, ((DASH_COOLDOWN - dashCooldownLeft) / DASH_COOLDOWN) * 100));
+        hudDashBar.style.width = `${progress}%`;
+        hudDashBar.classList.add("cooling");
+      }
+    }
+
+    function resetGame() {
+      score = 0;
+      coinsCollected = 0;
+      surviveTime = 0;
+      speedLevel = 1;
+      dashCooldownLeft = 0;
+      dashInvulnLeft = 0;
+      survivalScoreAcc = 0;
+      hazards = [];
+      coins = [];
+      popups = [];
+      afterimages = [];
+      hazardTimer = 0;
+      coinTimer = 0;
+      player.x = canvas.clientWidth * 0.5;
+      player.y = canvas.clientHeight * 0.78;
+      player.lastDirX = 0;
+      player.lastDirY = -1;
+      updateHud();
+    }
+
+    function startGame() {
+      resetGame();
+      state = "playing";
+      lastFrameTime = performance.now();
+      startOverlay.classList.add("hidden");
+      pauseOverlay.classList.add("hidden");
+      overOverlay.classList.add("hidden");
+      pauseBtn.disabled = false;
+      pauseBtn.textContent = "일시정지";
+      spawnCoin();
+      spawnHazard();
+    }
+
+    function togglePause() {
+      if (state === "playing") {
+        state = "paused";
+        pauseOverlay.classList.remove("hidden");
+        pauseBtn.textContent = "재개";
+      } else if (state === "paused") {
+        state = "playing";
+        lastFrameTime = performance.now();
+        pauseOverlay.classList.add("hidden");
+        pauseBtn.textContent = "일시정지";
+      }
+    }
+
+    function gameOver() {
+      state = "over";
+      pauseBtn.disabled = true;
+      const finalInt = Math.floor(score);
+      if (finalInt > bestScore) {
+        bestScore = finalInt;
+        saveBestScore(bestScore);
+      }
+      updateHud();
+      finalScoreText.textContent = `${finalInt.toLocaleString("ko-KR")}점`;
+      overSummary.textContent = `획득 코인 ${coinsCollected}개 · 생존 시간 ${surviveTime.toFixed(1)}초 · 최고 기록 ${bestScore.toLocaleString("ko-KR")}점`;
+      overOverlay.classList.remove("hidden");
+    }
+
+    function getCurrentInputVector() {
+      let dx = 0;
+      let dy = 0;
+      if (keys.has("ArrowLeft") || keys.has("KeyA")) dx -= 1;
+      if (keys.has("ArrowRight") || keys.has("KeyD")) dx += 1;
+      if (keys.has("ArrowUp") || keys.has("KeyW")) dy -= 1;
+      if (keys.has("ArrowDown") || keys.has("KeyS")) dy += 1;
+
+      if (dx !== 0 && dy !== 0) {
+        const inv = 1 / Math.SQRT2;
+        dx *= inv;
+        dy *= inv;
+      }
+      return { dx, dy };
+    }
+
+    function triggerDash() {
+      if (state !== "playing" || dashCooldownLeft > 0) return;
+
+      const { dx, dy } = getCurrentInputVector();
+      let dirX = dx;
+      let dirY = dy;
+      if (dirX === 0 && dirY === 0) {
+        dirX = player.lastDirX;
+        dirY = player.lastDirY;
+      }
+
+      const startX = player.x;
+      const startY = player.y;
+
+      for (let i = 0; i < 4; i++) {
+        const ratio = i / 4;
+        afterimages.push({
+          x: startX + dirX * DASH_DISTANCE * ratio,
+          y: startY + dirY * DASH_DISTANCE * ratio,
+          radius: player.radius,
+          alpha: 0.55 - ratio * 0.1
+        });
+      }
+
+      player.x += dirX * DASH_DISTANCE;
+      player.y += dirY * DASH_DISTANCE;
+      clampPlayer();
+
+      dashCooldownLeft = DASH_COOLDOWN;
+      dashInvulnLeft = DASH_INVULN_DURATION;
+      addPopup(player.x, player.y - 14, "DASH!", "#a78bfa");
+      updateHud();
+    }
+
+    function spawnHazard() {
+      const cfg = DIFF_CONFIG[difficulty];
+      const w = canvas.clientWidth;
+      const h = canvas.clientHeight;
+      const radius = 13 + Math.random() * 11;
+      const levelBoost = 1 + (speedLevel - 1) * 0.1;
+      const speed = (cfg.hazardSpeedMin + Math.random() * (cfg.hazardSpeedMax - cfg.hazardSpeedMin)) * levelBoost;
+
+      const fromSide = Math.random() < 0.28;
+      if (!fromSide) {
+        const x = radius + 12 + Math.random() * Math.max(20, w - (radius + 12) * 2);
+        const vx = (Math.random() - 0.5) * 65;
+        hazards.push({ x, y: -radius - 6, vx, vy: speed, radius, rot: 0, vRot: (Math.random() - 0.5) * 6 });
+      } else {
+        const leftSide = Math.random() < 0.5;
+        const x = leftSide ? -radius - 6 : w + radius + 6;
+        const y = radius + 24 + Math.random() * Math.max(40, h * 0.65);
+        const vx = (leftSide ? 1 : -1) * speed * 0.85;
+        const vy = speed * 0.45;
+        hazards.push({ x, y, vx, vy, radius, rot: 0, vRot: (Math.random() - 0.5) * 6 });
+      }
+    }
+
+    function spawnCoin() {
+      const w = canvas.clientWidth;
+      const h = canvas.clientHeight;
+      const radius = 11;
+      const pad = radius + 22;
+      const x = pad + Math.random() * Math.max(20, w - pad * 2);
+      const y = pad + Math.random() * Math.max(20, h - pad * 2);
+      coins.push({ x, y, radius, ttl: 8.5, pulse: 0 });
+    }
+
+    function addPopup(x, y, text, color) {
+      popups.push({ x, y, text, color, alpha: 1, vy: -30 });
+    }
+
+    window.addEventListener("keydown", (e) => {
+      const code = e.code;
+      if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", "Space"].includes(code)) {
         e.preventDefault();
-        fileInput.click();
       }
-    });
-    fileInput.addEventListener("change", (e) => {
-      if (e.target.files && e.target.files[0]) decodeImageFile(e.target.files[0]);
-    });
-    dropzone.addEventListener("dragover", (e) => {
-      e.preventDefault();
-      dropzone.classList.add("dragover");
-    });
-    dropzone.addEventListener("dragleave", () => dropzone.classList.remove("dragover"));
-    dropzone.addEventListener("drop", (e) => {
-      e.preventDefault();
-      dropzone.classList.remove("dragover");
-      const file = e.dataTransfer.files && e.dataTransfer.files[0];
-      if (file) decodeImageFile(file);
-    });
 
-    copyDecodedBtn.addEventListener("click", async () => {
-      if (!currentDecodedText) return;
-      try {
-        await navigator.clipboard.writeText(currentDecodedText);
-        copyDecodedBtn.textContent = "복사 완료";
-        setTimeout(() => { copyDecodedBtn.textContent = "링크 복사"; }, 1400);
-      } catch {
-        const temp = document.createElement("input");
-        temp.value = currentDecodedText;
-        document.body.appendChild(temp);
-        temp.select();
-        document.execCommand("copy");
-        document.body.removeChild(temp);
+      if (code === "Escape" || code === "KeyP") {
+        if (state === "playing" || state === "paused") {
+          togglePause();
+        }
+        return;
       }
+
+      if ((code === "ShiftLeft" || code === "ShiftRight" || code === "Space") && !e.repeat) {
+        triggerDash();
+      }
+
+      keys.add(code);
     });
 
-    // [03] 퀵 메모 저장
-    const quickNoteArea = document.getElementById("quickNoteArea");
-    const saveNoteBtn = document.getElementById("saveNoteBtn");
-    const clearNoteBtn = document.getElementById("clearNoteBtn");
-    const noteSaveStatus = document.getElementById("noteSaveStatus");
-    const NOTE_KEY = "github_index_hub_note_v1";
-
-    quickNoteArea.value = localStorage.getItem(NOTE_KEY) || "";
-
-    saveNoteBtn.addEventListener("click", () => {
-      localStorage.setItem(NOTE_KEY, quickNoteArea.value);
-      noteSaveStatus.textContent = "저장됨 (" + new Date().toLocaleTimeString("ko-KR") + ")";
+    window.addEventListener("keyup", (e) => {
+      keys.delete(e.code);
     });
 
-    clearNoteBtn.addEventListener("click", () => {
-      quickNoteArea.value = "";
-      localStorage.removeItem(NOTE_KEY);
-      noteSaveStatus.textContent = "메모를 비웠습니다.";
+    function update(dtMs) {
+      const dt = dtMs / 1000;
+      const cfg = DIFF_CONFIG[difficulty];
+
+      surviveTime += dt;
+      speedLevel = 1 + Math.floor(surviveTime / 10);
+
+      if (dashCooldownLeft > 0) {
+        dashCooldownLeft = Math.max(0, dashCooldownLeft - dt);
+      }
+      if (dashInvulnLeft > 0) {
+        dashInvulnLeft = Math.max(0, dashInvulnLeft - dt);
+      }
+
+      survivalScoreAcc += dt * 35 * cfg.scoreMult * (1 + (speedLevel - 1) * 0.15);
+      if (survivalScoreAcc >= 1) {
+        const add = Math.floor(survivalScoreAcc);
+        score += add;
+        survivalScoreAcc -= add;
+      }
+
+      const { dx, dy } = getCurrentInputVector();
+      if (dx !== 0 || dy !== 0) {
+        player.lastDirX = dx;
+        player.lastDirY = dy;
+      }
+
+      player.x += dx * cfg.playerSpeed * dt;
+      player.y += dy * cfg.playerSpeed * dt;
+      clampPlayer();
+
+      const spawnScale = Math.max(0.52, 1 - (speedLevel - 1) * 0.06);
+      hazardTimer += dtMs;
+      if (hazardTimer >= cfg.hazardInterval * spawnScale) {
+        hazardTimer = 0;
+        spawnHazard();
+      }
+
+      coinTimer += dtMs;
+      if (coinTimer >= cfg.coinInterval && coins.length < 4) {
+        coinTimer = 0;
+        spawnCoin();
+      }
+
+      const w = canvas.clientWidth;
+      const h = canvas.clientHeight;
+      for (let i = hazards.length - 1; i >= 0; i--) {
+        const hz = hazards[i];
+        hz.x += hz.vx * dt;
+        hz.y += hz.vy * dt;
+        hz.rot += hz.vRot * dt;
+
+        if (dashInvulnLeft <= 0) {
+          const dist = Math.hypot(player.x - hz.x, player.y - hz.y);
+          if (dist < player.radius + hz.radius - 3) {
+            gameOver();
+            return;
+          }
+        }
+
+        if (hz.y - hz.radius > h + 40 || hz.x < -80 || hz.x > w + 80) {
+          hazards.splice(i, 1);
+        }
+      }
+
+      for (let i = coins.length - 1; i >= 0; i--) {
+        const c = coins[i];
+        c.ttl -= dt;
+        c.pulse += dt * 5;
+
+        const dist = Math.hypot(player.x - c.x, player.y - c.y);
+        if (dist <= player.radius + c.radius + 2) {
+          coinsCollected += 1;
+          const gained = Math.round(150 * cfg.scoreMult);
+          score += gained;
+          addPopup(c.x, c.y - 8, `+${gained}`, "#fbbf24");
+          coins.splice(i, 1);
+          continue;
+        }
+
+        if (c.ttl <= 0) {
+          coins.splice(i, 1);
+        }
+      }
+
+      for (let i = afterimages.length - 1; i >= 0; i--) {
+        afterimages[i].alpha -= dt * 2.6;
+        if (afterimages[i].alpha <= 0) {
+          afterimages.splice(i, 1);
+        }
+      }
+
+      for (let i = popups.length - 1; i >= 0; i--) {
+        const p = popups[i];
+        p.y += p.vy * dt;
+        p.alpha -= dt * 1.3;
+        if (p.alpha <= 0) {
+          popups.splice(i, 1);
+        }
+      }
+
+      updateHud();
+    }
+
+    function draw() {
+      const w = canvas.clientWidth;
+      const h = canvas.clientHeight;
+      ctx.clearRect(0, 0, w, h);
+
+      ctx.strokeStyle = "rgba(148, 163, 184, 0.06)";
+      ctx.lineWidth = 1;
+      for (let x = 40; x < w; x += 40) {
+        ctx.beginPath();
+        ctx.moveTo(x, 0);
+        ctx.lineTo(x, h);
+        ctx.stroke();
+      }
+      for (let y = 40; y < h; y += 40) {
+        ctx.beginPath();
+        ctx.moveTo(0, y);
+        ctx.lineTo(w, y);
+        ctx.stroke();
+      }
+
+      for (const img of afterimages) {
+        ctx.beginPath();
+        ctx.arc(img.x, img.y, img.radius, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(167, 139, 250, ${Math.max(0, img.alpha) * 0.45})`;
+        ctx.fill();
+      }
+
+      for (const c of coins) {
+        const r = c.radius + Math.sin(c.pulse) * 1.4;
+        ctx.beginPath();
+        ctx.arc(c.x, c.y, r, 0, Math.PI * 2);
+        ctx.fillStyle = "rgba(251, 191, 36, 0.22)";
+        ctx.fill();
+        ctx.lineWidth = 2.5;
+        ctx.strokeStyle = "#fbbf24";
+        ctx.stroke();
+
+        ctx.beginPath();
+        ctx.arc(c.x, c.y, r * 0.45, 0, Math.PI * 2);
+        ctx.fillStyle = "#fde68a";
+        ctx.fill();
+      }
+
+      for (const hz of hazards) {
+        ctx.save();
+        ctx.translate(hz.x, hz.y);
+        ctx.rotate(hz.rot);
+        const s = hz.radius;
+
+        ctx.beginPath();
+        ctx.moveTo(0, -s);
+        ctx.lineTo(s, 0);
+        ctx.lineTo(0, s);
+        ctx.lineTo(-s, 0);
+        ctx.closePath();
+
+        ctx.fillStyle = "rgba(251, 113, 133, 0.24)";
+        ctx.fill();
+        ctx.lineWidth = 2.5;
+        ctx.strokeStyle = "#fb7185";
+        ctx.stroke();
+        ctx.restore();
+      }
+
+      const isInvuln = dashInvulnLeft > 0;
+      if (isInvuln) {
+        ctx.beginPath();
+        ctx.arc(player.x, player.y, player.radius + 6, 0, Math.PI * 2);
+        ctx.strokeStyle = "rgba(167, 139, 250, 0.85)";
+        ctx.lineWidth = 2;
+        ctx.stroke();
+      }
+
+      ctx.beginPath();
+      ctx.arc(player.x, player.y, player.radius, 0, Math.PI * 2);
+      ctx.fillStyle = isInvuln ? "rgba(167, 139, 250, 0.35)" : "rgba(52, 211, 153, 0.25)";
+      ctx.fill();
+      ctx.lineWidth = 3;
+      ctx.strokeStyle = isInvuln ? "#a78bfa" : "#34d399";
+      ctx.stroke();
+
+      ctx.beginPath();
+      ctx.arc(player.x, player.y, 5, 0, Math.PI * 2);
+      ctx.fillStyle = "#ffffff";
+      ctx.fill();
+
+      ctx.font = "800 13px ui-monospace, SFMono-Regular, Menlo, monospace";
+      ctx.textAlign = "center";
+      for (const p of popups) {
+        ctx.globalAlpha = Math.max(0, p.alpha);
+        ctx.fillStyle = p.color;
+        ctx.fillText(p.text, p.x, p.y);
+      }
+      ctx.globalAlpha = 1;
+    }
+
+    function loop(now) {
+      if (state === "playing") {
+        const dt = Math.min(100, now - lastFrameTime);
+        lastFrameTime = now;
+        update(dt);
+      }
+      draw();
+      requestAnimationFrame(loop);
+    }
+
+    diffBtns.forEach((btn) => {
+      btn.addEventListener("click", () => {
+        diffBtns.forEach((b) => b.classList.remove("active"));
+        btn.classList.add("active");
+        difficulty = btn.dataset.diff;
+        if (state === "playing") {
+          startGame();
+        }
+      });
     });
+
+    startBtn.addEventListener("click", startGame);
+    playAgainBtn.addEventListener("click", startGame);
+    restartBtn.addEventListener("click", startGame);
+    pauseBtn.addEventListener("click", togglePause);
+    resumeBtn.addEventListener("click", togglePause);
+
+    window.addEventListener("resize", resizeCanvas);
+    resizeCanvas();
+    updateHud();
+    requestAnimationFrame(loop);
   </script>
 </body>
 </html>
