@@ -3,11 +3,11 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>구내식당 식수 예약 시스템</title>
+  <title>횡성군청 구내식당 예약 시스템</title>
   <style>
     :root {
-      --primary: #2563eb;
-      --primary-hover: #1d4ed8;
+      --primary: #1d4ed8;
+      --primary-hover: #1e40af;
       --danger: #dc2626;
       --warning: #d97706;
       --success: #16a34a;
@@ -33,7 +33,7 @@
     }
 
     .container {
-      max-width: 860px;
+      max-width: 880px;
       margin: 0 auto;
     }
 
@@ -217,8 +217,26 @@
       margin-bottom: 14px;
     }
 
+    .settings-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-top: 12px;
+      margin-bottom: 14px;
+    }
+
+    .field-label {
+      display: block;
+      font-size: 0.84rem;
+      font-weight: 600;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+
     input[type="text"],
     input[type="date"],
+    input[type="time"],
+    input[type="number"],
     select {
       width: 100%;
       padding: 11px 12px;
@@ -365,9 +383,10 @@
       align-items: center;
     }
 
-    @media (max-width: 600px) {
+    @media (max-width: 650px) {
       .form-group,
-      .status-grid {
+      .status-grid,
+      .settings-grid {
         grid-template-columns: 1fr;
       }
     }
@@ -376,7 +395,7 @@
 <body>
   <div class="container">
     <header>
-      <h1>🍱 구내식당 식수 예약 시스템</h1>
+      <h1>🏛️ 횡성군청 구내식당 예약 시스템</h1>
       <div class="tabs">
         <button class="tab-btn active" id="tabUser" type="button" onclick="switchTab('user')">신청자 화면</button>
         <button class="tab-btn" id="tabAdmin" type="button" onclick="switchTab('admin')">관리자 화면</button>
@@ -385,7 +404,7 @@
 
     <div class="test-bar">
       <div>
-        <strong>⏰ 접수 시간: 매일 10:00 ~ 12:00</strong>
+        <strong>⏰ 접수 시간: <span id="bannerTimeRange">10:00 ~ 12:00</span></strong>
         <span id="timeStatusText" style="margin-left: 8px;"></span>
       </div>
       <label class="switch-wrap">
@@ -402,13 +421,15 @@
       <div class="card">
         <div class="card-header">
           <h2 style="font-size: 1.18rem;">오늘의 식수 현황 (<span id="todayDateLabel"></span>)</h2>
-          <span style="font-size: 0.85rem; color: var(--muted);">정원 150명 / 초과 시 자동 대기</span>
+          <span style="font-size: 0.85rem; color: var(--muted);">
+            확정 정원 <strong id="userCapacityLabel">150</strong>명 · 초과 시 자동 대기
+          </span>
         </div>
 
         <div class="status-grid">
           <div class="stat-box highlight">
             <div class="label">확정 인원</div>
-            <div class="value"><span id="confirmedCount">0</span> / 150</div>
+            <div class="value"><span id="confirmedCount">0</span> / <span id="confirmedCapText">150</span></div>
           </div>
           <div class="stat-box">
             <div class="label">남은 자리</div>
@@ -425,14 +446,14 @@
         </div>
 
         <div class="form-group">
-          <input type="text" id="userDept" placeholder="부서명 (예: 개발팀)" autocomplete="off" />
+          <input type="text" id="userDept" placeholder="부서명 (예: 기획감사실, 총무과)" autocomplete="off" />
           <input type="text" id="userName" placeholder="이름 (예: 홍길동)" autocomplete="off" />
         </div>
 
         <button class="btn btn-primary" id="reserveBtn" type="button" onclick="handleReserve()">식사 예약하기</button>
         <p class="notice">
-          ※ 정원 150명 마감 후에는 '대기'로 등록되며, 확정자가 취소하면 대기 1번부터 자동 확정됩니다.<br />
-          ※ 취소 후 재신청 시 신청 시각 기준으로 맨 뒤 순번에 등록되며, 12시 이후 취소는 관리자에게 문의해 주세요.
+          ※ 접수 시간(<span id="noticeTimeRange">10:00 ~ 12:00</span>) 내 신청 가능하며, 확정 정원(<span id="noticeCapacity">150</span>명) 초과 시 '대기'로 등록됩니다.<br />
+          ※ 확정자 취소 시 대기 1번부터 자동 확정되며, 취소 후 재신청 시 신청 시각 기준으로 맨 뒤 순번에 등록됩니다.
         </p>
       </div>
 
@@ -445,9 +466,43 @@
 
     <!-- 관리자 화면 -->
     <section id="adminView" class="hidden">
+      <!-- 운영 설정 (예약시간 및 확정 인원 변경) -->
+      <div class="card">
+        <div class="card-header">
+          <h2 style="font-size: 1.15rem;">⚙️ 예약 시간 및 확정 인원 설정</h2>
+          <span style="font-size: 0.85rem; color: var(--muted);">
+            현재 적용: <strong id="currentConfigSummary">10:00 ~ 12:00 / 정원 150명</strong>
+          </span>
+        </div>
+
+        <div class="settings-grid">
+          <div>
+            <label class="field-label" for="cfgStartTime">예약 시작 시간</label>
+            <input type="time" id="cfgStartTime" value="10:00" />
+          </div>
+          <div>
+            <label class="field-label" for="cfgEndTime">예약 종료 시간</label>
+            <input type="time" id="cfgEndTime" value="12:00" />
+          </div>
+          <div>
+            <label class="field-label" for="cfgMaxCapacity">일일 확정 인원 (명)</label>
+            <input type="number" id="cfgMaxCapacity" min="1" max="2000" value="150" />
+          </div>
+        </div>
+
+        <div class="toolbar">
+          <button class="btn btn-primary btn-sm" type="button" onclick="saveSettings()">설정 저장 및 명단 반영</button>
+          <button class="btn btn-outline btn-sm" type="button" onclick="resetSettings()">기본값 복원 (10:00~12:00, 150명)</button>
+        </div>
+        <p class="notice">
+          ※ 확정 인원을 줄이거나 늘리면 기존 유효 신청자(확정/대기) 순번이 새 정원에 맞춰 즉시 재조정됩니다.
+        </p>
+      </div>
+
+      <!-- 예약 명단 관리 -->
       <div class="card">
         <div class="card-header" style="margin-bottom: 14px;">
-          <h2 style="font-size: 1.18rem;">📋 예약 명단 및 취소/대기 관리</h2>
+          <h2 style="font-size: 1.18rem;">📋 횡성군청 구내식당 예약 명단</h2>
           <div class="toolbar">
             <input type="date" id="adminDateFilter" onchange="renderAdminTable()" style="width: auto; padding: 7px 10px;" />
             <button class="btn btn-outline btn-sm" type="button" onclick="copyListForExcel()">📋 명단 복사</button>
@@ -456,7 +511,7 @@
         </div>
 
         <div style="background: var(--bg); padding: 12px; border-radius: 10px; margin-bottom: 14px; display: flex; gap: 8px; flex-wrap: wrap;">
-          <input type="text" id="adminAddDept" placeholder="부서명" style="flex: 1; min-width: 120px; padding: 8px 10px;" />
+          <input type="text" id="adminAddDept" placeholder="부서명 (예: 재무과)" style="flex: 1; min-width: 120px; padding: 8px 10px;" />
           <input type="text" id="adminAddName" placeholder="이름 (전화/방문 대리등록)" style="flex: 1; min-width: 150px; padding: 8px 10px;" />
           <button class="btn btn-primary btn-sm" type="button" onclick="adminAddReservation()">+ 대리 등록</button>
         </div>
@@ -489,13 +544,20 @@
   </div>
 
   <script>
-    const MAX_CAPACITY = 150;
+    const DEFAULT_CONFIG = {
+      startTime: "10:00",
+      endTime: "12:00",
+      maxCapacity: 150
+    };
     const ADMIN_PW = "1234";
-    const STORAGE_KEY = "cafeteria_reservations_index_v1";
+    const DATA_STORAGE_KEY = "hoengseong_cafeteria_reservations_v1";
+    const CONFIG_STORAGE_KEY = "hoengseong_cafeteria_config_v1";
 
-    let memoryFallback = [];
+    let memoryReservations = [];
+    let memoryConfig = { ...DEFAULT_CONFIG };
     let isAdminAuthenticated = false;
     let currentFilter = "ALL";
+    let settingsFormInitialized = false;
 
     function getTodayStr() {
       const now = new Date();
@@ -503,34 +565,77 @@
       return new Date(now - offset).toISOString().split("T")[0];
     }
 
+    function getConfig() {
+      try {
+        const raw = localStorage.getItem(CONFIG_STORAGE_KEY);
+        if (!raw) return { ...memoryConfig };
+        const parsed = JSON.parse(raw);
+        const cap = Number(parsed.maxCapacity);
+        return {
+          startTime: typeof parsed.startTime === "string" && parsed.startTime ? parsed.startTime : DEFAULT_CONFIG.startTime,
+          endTime: typeof parsed.endTime === "string" && parsed.endTime ? parsed.endTime : DEFAULT_CONFIG.endTime,
+          maxCapacity: Number.isFinite(cap) && cap >= 1 ? Math.floor(cap) : DEFAULT_CONFIG.maxCapacity
+        };
+      } catch (e) {
+        return { ...memoryConfig };
+      }
+    }
+
+    function saveConfig(cfg) {
+      memoryConfig = { ...cfg };
+      try {
+        localStorage.setItem(CONFIG_STORAGE_KEY, JSON.stringify(cfg));
+      } catch (e) {
+        // 스토리지 제한 환경에서도 메모리 상태 유지
+      }
+    }
+
     function getReservations() {
       try {
-        const raw = localStorage.getItem(STORAGE_KEY);
-        if (!raw) return [...memoryFallback];
+        const raw = localStorage.getItem(DATA_STORAGE_KEY);
+        if (!raw) return [...memoryReservations];
         const parsed = JSON.parse(raw);
-        return Array.isArray(parsed) ? parsed : [...memoryFallback];
+        return Array.isArray(parsed) ? parsed : [...memoryReservations];
       } catch (e) {
-        return [...memoryFallback];
+        return [...memoryReservations];
       }
     }
 
     function saveReservations(data) {
-      memoryFallback = [...data];
+      memoryReservations = [...data];
       try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+        localStorage.setItem(DATA_STORAGE_KEY, JSON.stringify(data));
       } catch (e) {
-        // 스토리지 접근 제한 환경에서도 메모리 상태로 유지
+        // 스토리지 제한 환경에서도 메모리 상태 유지
       }
+    }
+
+    function timeToMinutes(hhmm) {
+      const parts = (hhmm || "").split(":");
+      if (parts.length < 2) return null;
+      const h = Number(parts[0]);
+      const m = Number(parts[1]);
+      if (!Number.isFinite(h) || !Number.isFinite(m) || h < 0 || h > 23 || m < 0 || m > 59) return null;
+      return h * 60 + m;
     }
 
     function isWithinBookingHours() {
       const toggle = document.getElementById("testModeToggle");
       if (toggle && toggle.checked) return true;
-      const hour = new Date().getHours();
-      return hour >= 10 && hour < 12;
+
+      const cfg = getConfig();
+      const startMin = timeToMinutes(cfg.startTime);
+      const endMin = timeToMinutes(cfg.endTime);
+      if (startMin === null || endMin === null) return false;
+
+      const now = new Date();
+      const currentMin = now.getHours() * 60 + now.getMinutes();
+      return currentMin >= startMin && currentMin <= endMin;
     }
 
     function rebalanceQueue(dateStr) {
+      const cfg = getConfig();
+      const cap = cfg.maxCapacity;
       const all = getReservations();
       const dayList = all.filter((r) => r.date === dateStr);
       const otherList = all.filter((r) => r.date !== dateStr);
@@ -542,22 +647,80 @@
       const canceled = dayList.filter((r) => r.status === "CANCELED");
 
       active.forEach((item, index) => {
-        if (index < MAX_CAPACITY) {
+        if (index < cap) {
           item.status = "CONFIRMED";
           item.waitNumber = null;
         } else {
           item.status = "WAITLIST";
-          item.waitNumber = index - MAX_CAPACITY + 1;
+          item.waitNumber = index - cap + 1;
         }
       });
 
       saveReservations([...otherList, ...active, ...canceled]);
     }
 
+    function rebalanceAllDates() {
+      const all = getReservations();
+      const dates = [...new Set(all.map((r) => r.date))];
+      dates.forEach((d) => rebalanceQueue(d));
+    }
+
+    function syncSettingsInputs(force = false) {
+      if (!isAdminAuthenticated) return;
+      if (settingsFormInitialized && !force) return;
+      const cfg = getConfig();
+      document.getElementById("cfgStartTime").value = cfg.startTime;
+      document.getElementById("cfgEndTime").value = cfg.endTime;
+      document.getElementById("cfgMaxCapacity").value = cfg.maxCapacity;
+      settingsFormInitialized = true;
+    }
+
+    function saveSettings() {
+      const startTime = document.getElementById("cfgStartTime").value;
+      const endTime = document.getElementById("cfgEndTime").value;
+      const capVal = Number(document.getElementById("cfgMaxCapacity").value);
+
+      const startMin = timeToMinutes(startTime);
+      const endMin = timeToMinutes(endTime);
+
+      if (startMin === null || endMin === null) {
+        alert("올바른 예약 시작/종료 시간을 입력해주세요.");
+        return;
+      }
+      if (endMin < startMin) {
+        alert("예약 종료 시간은 시작 시간보다 늦거나 같아야 합니다.");
+        return;
+      }
+      if (!Number.isFinite(capVal) || capVal < 1) {
+        alert("확정 인원은 1명 이상으로 입력해주세요.");
+        return;
+      }
+
+      saveConfig({
+        startTime,
+        endTime,
+        maxCapacity: Math.floor(capVal)
+      });
+      rebalanceAllDates();
+      syncSettingsInputs(true);
+      renderAll();
+      alert(`설정이 저장되었습니다. (접수 시간: ${startTime} ~ ${endTime}, 확정 정원: ${Math.floor(capVal)}명)`);
+    }
+
+    function resetSettings() {
+      saveConfig({ ...DEFAULT_CONFIG });
+      rebalanceAllDates();
+      syncSettingsInputs(true);
+      renderAll();
+      alert("기본값(10:00 ~ 12:00, 정원 150명)으로 복원되었습니다.");
+    }
+
     function handleReserve(customDept = null, customName = null, targetDate = null) {
       const isAdminAction = customDept !== null;
+      const cfg = getConfig();
+
       if (!isAdminAction && !isWithinBookingHours()) {
-        alert("예약 가능 시간(오전 10:00 ~ 12:00)이 아닙니다.");
+        alert(`예약 가능 시간(${cfg.startTime} ~ ${cfg.endTime})이 아닙니다.`);
         return;
       }
 
@@ -602,9 +765,9 @@
 
       const updated = getReservations().find((r) => r.id === newEntry.id);
       if (updated && updated.status === "CONFIRMED") {
-        alert(`[${dept} ${name}] 식사 예약이 확정되었습니다.`);
+        alert(`[${dept} ${name}] 횡성군청 구내식당 식사 예약이 확정되었습니다.`);
       } else if (updated) {
-        alert(`정원(150명)이 마감되어 [대기 ${updated.waitNumber}번]으로 등록되었습니다.`);
+        alert(`확정 정원(${cfg.maxCapacity}명)이 마감되어 [대기 ${updated.waitNumber}번]으로 등록되었습니다.`);
       }
 
       if (!isAdminAction) {
@@ -615,8 +778,9 @@
     }
 
     function cancelReservation(id, byAdmin = false) {
+      const cfg = getConfig();
       if (!byAdmin && !isWithinBookingHours()) {
-        alert("본인 취소는 오전 10:00 ~ 12:00 사이에만 가능합니다. 이후에는 관리자에게 문의하세요.");
+        alert(`본인 취소는 접수 시간(${cfg.startTime} ~ ${cfg.endTime}) 내에만 가능합니다. 이후에는 관리자에게 문의하세요.`);
         return;
       }
       if (!confirm("예약을 취소하시겠습니까? 취소 시 대기 순번이 자동으로 조정됩니다.")) {
@@ -672,6 +836,7 @@
         document.getElementById("adminView").classList.remove("hidden");
         document.getElementById("tabAdmin").classList.add("active");
         document.getElementById("tabUser").classList.remove("active");
+        syncSettingsInputs(false);
       } else {
         document.getElementById("adminView").classList.add("hidden");
         document.getElementById("userView").classList.remove("hidden");
@@ -697,7 +862,18 @@
 
     function renderAll() {
       const today = getTodayStr();
+      const cfg = getConfig();
+      const cap = cfg.maxCapacity;
+      const timeRangeLabel = `${cfg.startTime} ~ ${cfg.endTime}`;
+
       document.getElementById("todayDateLabel").textContent = today;
+      document.getElementById("bannerTimeRange").textContent = timeRangeLabel;
+      document.getElementById("noticeTimeRange").textContent = timeRangeLabel;
+      document.getElementById("noticeCapacity").textContent = cap;
+      document.getElementById("userCapacityLabel").textContent = cap;
+      document.getElementById("confirmedCapText").textContent = cap;
+      document.getElementById("currentConfigSummary").textContent = `${timeRangeLabel} / 정원 ${cap}명`;
+
       const dateInput = document.getElementById("adminDateFilter");
       if (!dateInput.value) {
         dateInput.value = today;
@@ -712,28 +888,28 @@
       const waitlist = todayList.filter((r) => r.status === "WAITLIST");
 
       document.getElementById("confirmedCount").textContent = confirmed.length;
-      document.getElementById("remainingCount").textContent = Math.max(0, MAX_CAPACITY - confirmed.length);
+      document.getElementById("remainingCount").textContent = Math.max(0, cap - confirmed.length);
       document.getElementById("waitlistCount").textContent = waitlist.length;
 
-      const percent = Math.min(100, (confirmed.length / MAX_CAPACITY) * 100);
+      const percent = Math.min(100, (confirmed.length / cap) * 100);
       const bar = document.getElementById("capacityBar");
       bar.style.width = `${percent}%`;
-      bar.classList.toggle("full", confirmed.length >= MAX_CAPACITY);
+      bar.classList.toggle("full", confirmed.length >= cap);
 
       if (canBook) {
         timeStatus.innerHTML = `<span style="color: var(--success); font-weight: 700;">● 접수 중</span>`;
         reserveBtn.disabled = false;
-        if (confirmed.length >= MAX_CAPACITY) {
-          reserveBtn.textContent = `정원 마감 - 대기 신청하기 (현재 대기 ${waitlist.length}명)`;
+        if (confirmed.length >= cap) {
+          reserveBtn.textContent = `확정 정원 마감 - 대기 신청하기 (현재 대기 ${waitlist.length}명)`;
           reserveBtn.className = "btn btn-warning";
         } else {
           reserveBtn.textContent = "식사 예약하기";
           reserveBtn.className = "btn btn-primary";
         }
       } else {
-        timeStatus.innerHTML = `<span style="color: var(--danger); font-weight: 700;">● 접수 마감 (10:00 ~ 12:00)</span>`;
+        timeStatus.innerHTML = `<span style="color: var(--danger); font-weight: 700;">● 접수 마감 (${timeRangeLabel})</span>`;
         reserveBtn.disabled = true;
-        reserveBtn.textContent = "예약 가능 시간이 아닙니다 (10:00 ~ 12:00)";
+        reserveBtn.textContent = `예약 가능 시간이 아닙니다 (${timeRangeLabel})`;
         reserveBtn.className = "btn";
       }
 
@@ -874,7 +1050,7 @@
       const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
       const link = document.createElement("a");
       link.href = URL.createObjectURL(blob);
-      link.download = `구내식당_예약명단_${dateStr}.csv`;
+      link.download = `횡성군청_구내식당_예약명단_${dateStr}.csv`;
       link.click();
     }
 
