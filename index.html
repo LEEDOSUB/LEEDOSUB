@@ -3,976 +3,883 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>최상단 INDEX · 사용자 이모지 헤더 &amp; 웹앱 허브</title>
-  <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
+  <title>구내식당 식수 예약 시스템</title>
   <style>
     :root {
-      --bg: #f4f6f9;
-      --surface: #ffffff;
-      --surface-2: #f8fafc;
-      --text: #0f172a;
-      --muted: #475569;
-      --accent: #0284c7;
-      --accent-hover: #0369a1;
-      --accent-soft: #e0f2fe;
-      --success: #15803d;
-      --error: #dc2626;
+      --primary: #2563eb;
+      --primary-hover: #1d4ed8;
+      --danger: #dc2626;
+      --warning: #d97706;
+      --success: #16a34a;
+      --bg: #f8fafc;
+      --card: #ffffff;
       --border: #e2e8f0;
-      --shadow: 0 4px 16px rgba(15, 23, 42, 0.05);
-      --radius: 14px;
+      --text: #1e293b;
+      --muted: #64748b;
     }
 
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
-    }
-
-    html {
-      scroll-behavior: smooth;
+      font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
     }
 
     body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans KR", sans-serif;
       background: var(--bg);
       color: var(--text);
-      line-height: 1.6;
-      padding: 24px 16px 64px;
+      line-height: 1.5;
+      padding: 20px;
     }
 
-    .app {
-      max-width: 960px;
+    .container {
+      max-width: 860px;
       margin: 0 auto;
-      display: grid;
-      gap: 20px;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 18px;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    h1 {
+      font-size: 1.45rem;
+      font-weight: 700;
+    }
+
+    .tabs {
+      display: flex;
+      gap: 6px;
+      background: #e2e8f0;
+      padding: 4px;
+      border-radius: 10px;
+    }
+
+    .tab-btn {
+      border: none;
+      background: transparent;
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      color: var(--muted);
+      transition: 0.2s;
+    }
+
+    .tab-btn.active {
+      background: var(--card);
+      color: var(--primary);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+    }
+
+    .test-bar {
+      background: #fef3c7;
+      border: 1px solid #f59e0b;
+      color: #92400e;
+      padding: 12px 16px;
+      border-radius: 10px;
+      margin-bottom: 18px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+      font-size: 0.9rem;
+    }
+
+    .switch-wrap {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+    }
+
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 44px;
+      height: 24px;
+    }
+
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      inset: 0;
+      background-color: #cbd5e1;
+      transition: 0.3s;
+      border-radius: 24px;
+    }
+
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 18px;
+      width: 18px;
+      left: 3px;
+      bottom: 3px;
+      background-color: #ffffff;
+      transition: 0.3s;
+      border-radius: 50%;
+    }
+
+    input:checked + .slider {
+      background-color: #f59e0b;
+    }
+
+    input:checked + .slider:before {
+      transform: translateX(20px);
     }
 
     .card {
-      background: var(--surface);
+      background: var(--card);
       border: 1px solid var(--border);
-      border-radius: var(--radius);
+      border-radius: 14px;
       padding: 22px;
-      box-shadow: var(--shadow);
+      margin-bottom: 18px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
     }
 
-    /* [00] 최상단 헤더 + 동그라미 사용자 이모지 */
-    .index-top {
+    .card-header {
       display: flex;
-      flex-wrap: wrap;
       justify-content: space-between;
       align-items: center;
-      gap: 14px;
-      margin-bottom: 14px;
-    }
-
-    .user-identity {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-    }
-
-    .user-emoji-wrap {
-      position: relative;
-      width: 64px;
-      height: 64px;
-      flex-shrink: 0;
-    }
-
-    .user-emoji-avatar {
-      width: 64px;
-      height: 64px;
-      border-radius: 50%;
-      object-fit: cover;
-      object-position: center 20%;
-      border: 3px solid var(--accent);
-      box-shadow: 0 4px 12px rgba(2, 132, 199, 0.2);
-      background: var(--accent-soft);
-      display: block;
-      transition: transform 0.18s ease, box-shadow 0.18s ease;
-    }
-
-    .user-emoji-avatar:hover {
-      transform: scale(1.06);
-      box-shadow: 0 6px 16px rgba(2, 132, 199, 0.3);
-    }
-
-    .user-emoji-badge {
-      position: absolute;
-      right: -2px;
-      bottom: -2px;
-      width: 22px;
-      height: 22px;
-      border-radius: 50%;
-      background: var(--accent);
-      color: #ffffff;
-      font-size: 0.7rem;
-      font-weight: 800;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border: 2px solid var(--surface);
-    }
-
-    .index-title {
-      font-size: 1.45rem;
-      font-weight: 800;
-      letter-spacing: -0.02em;
-      line-height: 1.25;
-    }
-
-    .index-sub {
-      color: var(--muted);
-      font-size: 0.9rem;
-      margin-top: 3px;
-    }
-
-    .badge {
-      display: inline-flex;
-      align-items: center;
-      font-size: 0.78rem;
-      font-weight: 700;
-      color: var(--accent-hover);
-      background: var(--accent-soft);
-      border: 1px solid #bae6fd;
-      padding: 6px 12px;
-      border-radius: 999px;
-    }
-
-    .index-nav {
-      display: flex;
       flex-wrap: wrap;
       gap: 8px;
-      margin-bottom: 16px;
     }
 
-    .index-nav a {
-      text-decoration: none;
-      color: var(--text);
-      background: var(--surface-2);
-      border: 1px solid var(--border);
-      padding: 6px 12px;
-      border-radius: 8px;
-      font-size: 0.84rem;
-      font-weight: 600;
-      transition: all 0.15s ease;
+    .status-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin: 16px 0;
     }
 
-    .index-nav a:hover {
-      border-color: var(--accent);
-      color: var(--accent);
-      background: var(--accent-soft);
-    }
-
-    .filter-bar {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      align-items: center;
-    }
-
-    .filter-bar input[type="search"] {
-      flex: 1 1 260px;
-      padding: 10px 14px;
+    .stat-box {
+      background: var(--bg);
+      padding: 16px;
       border-radius: 10px;
+      text-align: center;
       border: 1px solid var(--border);
-      background: var(--surface-2);
-      color: var(--text);
-      font-size: 0.92rem;
-      outline: none;
     }
 
-    .filter-bar input[type="search"]:focus {
-      border-color: var(--accent);
-      background: var(--surface);
-    }
-
-    .cat-pills {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-    }
-
-    .pill-btn {
-      background: var(--surface-2);
+    .stat-box .label {
+      font-size: 0.85rem;
       color: var(--muted);
-      border: 1px solid var(--border);
-      padding: 7px 12px;
-      border-radius: 8px;
-      font-size: 0.82rem;
+      margin-bottom: 4px;
+    }
+
+    .stat-box .value {
+      font-size: 1.5rem;
       font-weight: 700;
-      cursor: pointer;
     }
 
-    .pill-btn.active {
-      background: var(--accent);
-      color: #ffffff;
-      border-color: var(--accent);
+    .stat-box.highlight .value {
+      color: var(--primary);
     }
 
-    /* 섹션 헤더 */
-    .section-head {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: space-between;
-      align-items: center;
-      gap: 8px;
-      margin-bottom: 14px;
-      padding-bottom: 10px;
-      border-bottom: 1px solid var(--border);
+    .stat-box.wait .value {
+      color: var(--warning);
     }
 
-    .section-code {
-      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-      font-size: 0.8rem;
-      font-weight: 700;
-      color: var(--accent);
-    }
-
-    h2 {
-      font-size: 1.18rem;
-    }
-
-    .desc {
-      color: var(--muted);
-      font-size: 0.9rem;
-      margin-bottom: 14px;
-    }
-
-    /* [01] 게시판 리스트 */
-    .board-wrap {
-      overflow-x: auto;
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      background: var(--surface);
-    }
-
-    table.board-table {
+    .progress-wrap {
       width: 100%;
-      border-collapse: collapse;
-      min-width: 680px;
-      font-size: 0.9rem;
-    }
-
-    .board-table thead th {
-      background: var(--surface-2);
-      color: var(--muted);
-      font-size: 0.78rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.03em;
-      padding: 11px 14px;
-      border-bottom: 1px solid var(--border);
-      text-align: left;
-    }
-
-    .board-table tbody td {
-      padding: 13px 14px;
-      border-bottom: 1px solid var(--border);
-      vertical-align: middle;
-    }
-
-    .board-table tbody tr:last-child td {
-      border-bottom: none;
-    }
-
-    .board-table tbody tr:hover {
-      background: #f8fbff;
-    }
-
-    .col-no {
-      width: 64px;
-      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-      font-weight: 700;
-      color: var(--muted);
-    }
-
-    .col-tag {
-      width: 110px;
-    }
-
-    .tag {
-      display: inline-block;
-      font-size: 0.76rem;
-      font-weight: 700;
-      padding: 3px 9px;
+      height: 10px;
+      background: #e2e8f0;
       border-radius: 999px;
-      background: var(--accent-soft);
-      color: var(--accent-hover);
-      border: 1px solid #bae6fd;
+      overflow: hidden;
+      margin-bottom: 18px;
     }
 
-    .tag.game {
-      background: #fef3c7;
-      color: #b45309;
-      border-color: #fde68a;
+    .progress-bar {
+      height: 100%;
+      background: var(--primary);
+      transition: width 0.25s ease;
     }
 
-    .board-title-link {
-      font-weight: 700;
+    .progress-bar.full {
+      background: var(--warning);
+    }
+
+    .form-group {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    input[type="text"],
+    input[type="date"],
+    select {
+      width: 100%;
+      padding: 11px 12px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 0.98rem;
+      background: #ffffff;
       color: var(--text);
-      text-decoration: none;
-      display: block;
     }
 
-    .board-title-link:hover {
-      color: var(--accent);
-      text-decoration: underline;
-    }
-
-    .board-summary {
-      font-size: 0.82rem;
-      color: var(--muted);
-      margin-top: 2px;
-    }
-
-    .col-date {
-      width: 120px;
-      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-      font-size: 0.8rem;
-      color: var(--muted);
-    }
-
-    .col-action {
-      width: 150px;
-      text-align: right;
-      white-space: nowrap;
+    input:focus,
+    select:focus {
+      outline: none;
+      border-color: var(--primary);
     }
 
     .btn {
-      background: var(--accent);
-      color: #ffffff;
+      width: 100%;
+      padding: 12px 16px;
       border: none;
-      padding: 8px 13px;
       border-radius: 8px;
-      font-size: 0.82rem;
-      font-weight: 700;
+      font-size: 0.98rem;
+      font-weight: 600;
       cursor: pointer;
-      text-decoration: none;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      transition: background 0.15s ease;
+      transition: 0.2s;
     }
 
-    .btn:hover:not(:disabled) {
-      background: var(--accent-hover);
+    .btn-primary {
+      background: var(--primary);
+      color: #ffffff;
+    }
+
+    .btn-primary:hover:not(:disabled) {
+      background: var(--primary-hover);
+    }
+
+    .btn-warning {
+      background: var(--warning);
+      color: #ffffff;
+    }
+
+    .btn-danger {
+      background: var(--danger);
+      color: #ffffff;
+    }
+
+    .btn-outline {
+      background: #ffffff;
+      border: 1px solid var(--border);
+      color: var(--text);
+    }
+
+    .btn-outline:hover:not(:disabled) {
+      background: var(--bg);
     }
 
     .btn:disabled {
-      opacity: 0.45;
+      background: #cbd5e1;
+      color: #64748b;
       cursor: not-allowed;
     }
 
     .btn-sm {
       padding: 6px 10px;
-      font-size: 0.78rem;
+      font-size: 0.82rem;
+      width: auto;
     }
 
-    .btn-secondary {
-      background: var(--surface);
-      color: var(--text);
-      border: 1px solid var(--border);
-    }
-
-    .btn-secondary:hover:not(:disabled) {
-      border-color: var(--accent);
-      color: var(--accent);
-      background: var(--surface-2);
-    }
-
-    /* [02] QR 웹앱 섹션 */
-    .qr-tabs {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 8px;
-      background: var(--surface-2);
-      padding: 5px;
+    .my-ticket {
+      margin-top: 14px;
+      padding: 14px 16px;
       border-radius: 10px;
-      border: 1px solid var(--border);
-      margin-bottom: 16px;
-    }
-
-    .qr-tab-btn {
-      background: transparent;
-      color: var(--muted);
-      border: none;
-      padding: 9px 12px;
-      border-radius: 8px;
-      font-weight: 700;
-      font-size: 0.9rem;
-      cursor: pointer;
-    }
-
-    .qr-tab-btn.active {
-      background: var(--accent);
-      color: #ffffff;
-    }
-
-    .qr-panel {
-      display: none;
-    }
-
-    .qr-panel.active {
-      display: block;
-    }
-
-    label {
-      display: block;
-      font-size: 0.86rem;
-      font-weight: 600;
-      margin-bottom: 6px;
-    }
-
-    input[type="url"] {
-      width: 100%;
-      padding: 11px 14px;
-      border-radius: 10px;
-      border: 1px solid var(--border);
-      background: var(--surface-2);
-      color: var(--text);
-      font-size: 0.94rem;
-      outline: none;
-    }
-
-    input[type="url"]:focus {
-      border-color: var(--accent);
-      background: var(--surface);
-    }
-
-    .controls-row {
+      background: #eff6ff;
+      border: 1px solid #bfdbfe;
       display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
       flex-wrap: wrap;
-      gap: 10px;
-      margin-top: 12px;
-      align-items: center;
     }
 
-    .qr-preview-box {
-      margin-top: 16px;
-      background: var(--surface-2);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 20px;
-      min-height: 220px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-    }
-
-    #qrCodeContainer {
-      background: #ffffff;
-      padding: 14px;
-      border-radius: 10px;
-      border: 1px solid var(--border);
-      display: inline-flex;
-    }
-
-    .placeholder-text {
-      color: var(--muted);
-      font-size: 0.88rem;
-      text-align: center;
-    }
-
-    .dropzone {
-      border: 2px dashed #cbd5e1;
-      border-radius: 12px;
-      padding: 22px 16px;
-      text-align: center;
-      background: var(--surface-2);
-      cursor: pointer;
-    }
-
-    .dropzone:hover,
-    .dropzone.dragover {
-      border-color: var(--accent);
-      background: var(--accent-soft);
-    }
-
-    .dropzone p {
-      color: var(--muted);
-      font-size: 0.9rem;
-    }
-
-    .dropzone strong {
-      color: var(--accent-hover);
-    }
-
-    #fileInput {
-      display: none;
-    }
-
-    .uploaded-preview-wrap {
-      margin-top: 14px;
-      display: none;
-      justify-content: center;
-      background: var(--surface-2);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 12px;
-    }
-
-    .uploaded-preview-wrap.visible {
-      display: flex;
-    }
-
-    #uploadedPreview {
-      max-width: 100%;
-      max-height: 210px;
-      border-radius: 8px;
-      object-fit: contain;
-    }
-
-    .result-box {
-      margin-top: 14px;
-      background: var(--surface-2);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 14px;
-    }
-
-    .result-status {
-      font-size: 0.84rem;
+    .badge {
+      display: inline-block;
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-size: 0.78rem;
       font-weight: 700;
-      margin-bottom: 6px;
-      color: var(--muted);
     }
 
-    .result-status.ok { color: var(--success); }
-    .result-status.err { color: var(--error); }
+    .badge-confirmed {
+      background: #dcfce7;
+      color: #166534;
+    }
 
-    .decoded-link {
-      word-break: break-all;
-      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    .badge-waitlist {
+      background: #fef3c7;
+      color: #92400e;
+    }
+
+    .badge-canceled {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+      margin-top: 14px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
       font-size: 0.9rem;
-      color: var(--accent-hover);
-      font-weight: 600;
-      text-decoration: none;
     }
 
-    .guide-list {
-      padding-left: 18px;
+    th,
+    td {
+      padding: 11px 10px;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+      white-space: nowrap;
+    }
+
+    th {
+      background: var(--bg);
       color: var(--muted);
-      font-size: 0.88rem;
-      display: grid;
-      gap: 6px;
+      font-weight: 600;
     }
 
-    .guide-list code {
-      color: var(--text);
-      background: var(--surface-2);
-      border: 1px solid var(--border);
-      padding: 2px 6px;
-      border-radius: 5px;
+    .hidden {
+      display: none !important;
+    }
+
+    .notice {
+      font-size: 0.85rem;
+      color: var(--muted);
+      margin-top: 10px;
+    }
+
+    .toolbar {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    @media (max-width: 600px) {
+      .form-group,
+      .status-grid {
+        grid-template-columns: 1fr;
+      }
     }
   </style>
 </head>
 <body>
-  <main class="app">
-    <!-- [00] 최상단 헤더 + 동그라미 사용자 이모지 -->
-    <header id="top-index" class="card">
-      <div class="index-top">
-        <div class="user-identity">
-          <div class="user-emoji-wrap" title="사용자 이모지">
-            <img
-              class="user-emoji-avatar"
-              src="스크린샷 2026-11-27 101814.jpg"
-              alt="사용자 이모지 아바타"
-            />
-            <span class="user-emoji-badge" aria-hidden="true">★</span>
-          </div>
-          <div>
-            <h1 class="index-title">INDEX · 웹앱 게시판 허브</h1>
-            <p class="index-sub">최상단 인덱스에서 QR 웹앱과 저장소 콘텐츠를 게시판 형태로 조회하고 바로 실행합니다.</p>
-          </div>
-        </div>
-        <span class="badge">Avatar Index · index.html</span>
-      </div>
-
-      <nav class="index-nav" aria-label="최상단 인덱스 바로가기">
-        <a href="#top-index">[00] 최상단 INDEX</a>
-        <a href="#board-list">[01] 게시판 리스트</a>
-        <a href="#qr-studio">[02] QR 웹앱</a>
-        <a href="#deploy-notes">[03] 배포 메모</a>
-      </nav>
-
-      <div class="filter-bar">
-        <input id="boardSearch" type="search" placeholder="게시판 제목, 태그, 설명 검색 (예: QR, 생성, 읽기, 게임...)" autocomplete="off" />
-        <div class="cat-pills" role="group" aria-label="게시판 분류 필터">
-          <button class="pill-btn active" data-cat="all" type="button">전체</button>
-          <button class="pill-btn" data-cat="qr" type="button">QR 웹앱</button>
-          <button class="pill-btn" data-cat="game" type="button">게임</button>
-          <button class="pill-btn" data-cat="repo" type="button">저장소</button>
-        </div>
+  <div class="container">
+    <header>
+      <h1>🍱 구내식당 식수 예약 시스템</h1>
+      <div class="tabs">
+        <button class="tab-btn active" id="tabUser" type="button" onclick="switchTab('user')">신청자 화면</button>
+        <button class="tab-btn" id="tabAdmin" type="button" onclick="switchTab('admin')">관리자 화면</button>
       </div>
     </header>
 
-    <!-- [01] 게시판 형태 리스트업 -->
-    <section id="board-list" class="card">
-      <div class="section-head">
-        <h2>웹앱 게시판 리스트</h2>
-        <span class="section-code">INDEX-01 · BOARD</span>
+    <div class="test-bar">
+      <div>
+        <strong>⏰ 접수 시간: 매일 10:00 ~ 12:00</strong>
+        <span id="timeStatusText" style="margin-left: 8px;"></span>
       </div>
-      <p class="desc">등록된 웹앱과 저장소 항목입니다. <strong>바로 열기</strong>로 섹션으로 이동하거나 <strong>폴더 열기</strong>로 저장소 경로를 확인할 수 있습니다.</p>
+      <label class="switch-wrap">
+        <span>테스트 모드 (시간제한 해제)</span>
+        <span class="switch">
+          <input type="checkbox" id="testModeToggle" checked onchange="renderAll()" />
+          <span class="slider"></span>
+        </span>
+      </label>
+    </div>
 
-      <div class="board-wrap">
-        <table class="board-table" aria-label="웹앱 게시판 목록">
-          <thead>
-            <tr>
-              <th class="col-no">No.</th>
-              <th class="col-tag">분류</th>
-              <th>제목 및 요약</th>
-              <th class="col-date">업데이트</th>
-              <th class="col-action">실행</th>
-            </tr>
-          </thead>
-          <tbody id="boardTbody">
-            <tr data-cat="qr" data-keywords="qr 생성 링크 url 다운로드">
-              <td class="col-no">04</td>
-              <td class="col-tag"><span class="tag">QR 웹앱</span></td>
-              <td>
-                <a class="board-title-link" href="#qr-studio" onclick="openQrTab('generate')">QR 코드 자동 생성기</a>
-                <p class="board-summary">링크(URL)를 입력하면 QR 코드를 즉시 만들고 PNG 이미지로 저장합니다.</p>
-              </td>
-              <td class="col-date">2026-11-27</td>
-              <td class="col-action">
-                <a class="btn btn-sm" href="#qr-studio" onclick="openQrTab('generate')">생성 탭 열기</a>
-                <a class="btn btn-sm btn-secondary" href="./QR/">./QR/</a>
-              </td>
-            </tr>
+    <!-- 신청자 화면 -->
+    <section id="userView">
+      <div class="card">
+        <div class="card-header">
+          <h2 style="font-size: 1.18rem;">오늘의 식수 현황 (<span id="todayDateLabel"></span>)</h2>
+          <span style="font-size: 0.85rem; color: var(--muted);">정원 150명 / 초과 시 자동 대기</span>
+        </div>
 
-            <tr data-cat="qr" data-keywords="qr 읽기 이미지 업로드 링크 추출 복사">
-              <td class="col-no">03</td>
-              <td class="col-tag"><span class="tag">QR 웹앱</span></td>
-              <td>
-                <a class="board-title-link" href="#qr-studio" onclick="openQrTab('read')">QR 이미지 링크 판독기</a>
-                <p class="board-summary">이미지를 업로드하거나 드래그해 QR 코드 속 링크를 추출·복사·열기합니다.</p>
-              </td>
-              <td class="col-date">2026-11-27</td>
-              <td class="col-action">
-                <a class="btn btn-sm" href="#qr-studio" onclick="openQrTab('read')">읽기 탭 열기</a>
-                <a class="btn btn-sm btn-secondary" href="./QR/">./QR/</a>
-              </td>
-            </tr>
+        <div class="status-grid">
+          <div class="stat-box highlight">
+            <div class="label">확정 인원</div>
+            <div class="value"><span id="confirmedCount">0</span> / 150</div>
+          </div>
+          <div class="stat-box">
+            <div class="label">남은 자리</div>
+            <div class="value" id="remainingCount">150</div>
+          </div>
+          <div class="stat-box wait">
+            <div class="label">현재 대기</div>
+            <div class="value"><span id="waitlistCount">0</span>명</div>
+          </div>
+        </div>
 
-            <tr data-cat="game" data-keywords="게임 코인 대시 장애물 회피 wasd 방향키">
-              <td class="col-no">02</td>
-              <td class="col-tag"><span class="tag game">게임</span></td>
-              <td>
-                <a class="board-title-link" href="./GAME/">코인 대시 &amp; 장애물 회피 게임</a>
-                <p class="board-summary">방향키/WASD 이동, Shift/Space 대시 스킬과 코인 수집 아케이드 게임입니다.</p>
-              </td>
-              <td class="col-date">2026-11-27</td>
-              <td class="col-action">
-                <a class="btn btn-sm btn-secondary" href="./GAME/">./GAME/</a>
-              </td>
-            </tr>
+        <div class="progress-wrap">
+          <div class="progress-bar" id="capacityBar" style="width: 0%;"></div>
+        </div>
 
-            <tr data-cat="repo" data-keywords="저장소 readme github pages 배포">
-              <td class="col-no">01</td>
-              <td class="col-tag"><span class="tag">저장소</span></td>
-              <td>
-                <a class="board-title-link" href="./README.md">LEEDOSUB 저장소 README</a>
-                <p class="board-summary">GitHub 프로필 및 저장소 개요 문서입니다.</p>
-              </td>
-              <td class="col-date">2026-11-27</td>
-              <td class="col-action">
-                <a class="btn btn-sm btn-secondary" href="./README.md">README</a>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+        <div class="form-group">
+          <input type="text" id="userDept" placeholder="부서명 (예: 개발팀)" autocomplete="off" />
+          <input type="text" id="userName" placeholder="이름 (예: 홍길동)" autocomplete="off" />
+        </div>
+
+        <button class="btn btn-primary" id="reserveBtn" type="button" onclick="handleReserve()">식사 예약하기</button>
+        <p class="notice">
+          ※ 정원 150명 마감 후에는 '대기'로 등록되며, 확정자가 취소하면 대기 1번부터 자동 확정됩니다.<br />
+          ※ 취소 후 재신청 시 신청 시각 기준으로 맨 뒤 순번에 등록되며, 12시 이후 취소는 관리자에게 문의해 주세요.
+        </p>
+      </div>
+
+      <div class="card">
+        <h3 style="font-size: 1.08rem; margin-bottom: 10px;">🔍 내 예약 확인 및 취소</h3>
+        <input type="text" id="searchName" placeholder="신청한 이름을 입력하세요" oninput="renderMyReservation()" autocomplete="off" />
+        <div id="myReservationBox"></div>
       </div>
     </section>
 
-    <!-- [02] QR 웹앱 섹션 -->
-    <section id="qr-studio" class="card">
-      <div class="section-head">
-        <h2>QR 웹앱 (생성 · 이미지 판독)</h2>
-        <span class="section-code">INDEX-02 · QR WEBAPP</span>
-      </div>
-      <p class="desc">게시판에서 선택한 탭에 맞춰 링크로 QR을 생성하거나 이미지에서 링크를 읽을 수 있습니다.</p>
-
-      <div class="qr-tabs" role="tablist" aria-label="QR 웹앱 탭">
-        <button id="qrTabGenBtn" class="qr-tab-btn active" role="tab" aria-selected="true" type="button">
-          QR 생성하기
-        </button>
-        <button id="qrTabReadBtn" class="qr-tab-btn" role="tab" aria-selected="false" type="button">
-          이미지로 QR 읽기
-        </button>
-      </div>
-
-      <!-- QR 생성 패널 -->
-      <div id="qrPanelGen" class="qr-panel active">
-        <label for="linkInput">링크(URL) 입력</label>
-        <input id="linkInput" type="url" placeholder="예: https://github.com/LEEDOSUB/LEEDOSUB" autocomplete="off" />
-
-        <div class="controls-row">
-          <button id="downloadQrBtn" class="btn" type="button" disabled>PNG 다운로드</button>
-          <button id="clearQrBtn" class="btn btn-secondary" type="button">초기화</button>
-          <a class="btn btn-secondary" href="#top-index">최상단 INDEX로</a>
-        </div>
-
-        <div class="qr-preview-box">
-          <div id="qrCodeContainer" style="display: none;"></div>
-          <p id="qrPlaceholder" class="placeholder-text">링크를 입력하면 여기에 QR 코드가 자동으로 생성됩니다.</p>
-        </div>
-      </div>
-
-      <!-- QR 읽기 패널 -->
-      <div id="qrPanelRead" class="qr-panel">
-        <div id="dropzone" class="dropzone" tabindex="0" role="button" aria-label="QR 이미지 업로드">
-          <p><strong>이미지를 클릭해 선택</strong>하거나 여기에 드래그하세요 (PNG, JPG, WEBP)</p>
-        </div>
-        <input id="fileInput" type="file" accept="image/*" />
-
-        <div id="uploadedPreviewWrap" class="uploaded-preview-wrap">
-          <img id="uploadedPreview" alt="업로드된 QR 이미지" />
-        </div>
-
-        <div class="result-box">
-          <div id="readStatus" class="result-status">대기 중 · QR 이미지를 업로드해 주세요.</div>
-          <div id="decodedOutput">
-            <span class="placeholder-text">추출된 링크가 여기에 표시됩니다.</span>
+    <!-- 관리자 화면 -->
+    <section id="adminView" class="hidden">
+      <div class="card">
+        <div class="card-header" style="margin-bottom: 14px;">
+          <h2 style="font-size: 1.18rem;">📋 예약 명단 및 취소/대기 관리</h2>
+          <div class="toolbar">
+            <input type="date" id="adminDateFilter" onchange="renderAdminTable()" style="width: auto; padding: 7px 10px;" />
+            <button class="btn btn-outline btn-sm" type="button" onclick="copyListForExcel()">📋 명단 복사</button>
+            <button class="btn btn-outline btn-sm" type="button" onclick="exportCSV()">📥 CSV 다운로드</button>
           </div>
-          <div class="controls-row">
-            <button id="copyDecodedBtn" class="btn btn-secondary" type="button" disabled>링크 복사</button>
-            <a id="openDecodedLink" class="btn" href="#" target="_blank" rel="noopener noreferrer" style="display: none;">링크 열기</a>
-            <a class="btn btn-secondary" href="#top-index">최상단 INDEX로</a>
-          </div>
+        </div>
+
+        <div style="background: var(--bg); padding: 12px; border-radius: 10px; margin-bottom: 14px; display: flex; gap: 8px; flex-wrap: wrap;">
+          <input type="text" id="adminAddDept" placeholder="부서명" style="flex: 1; min-width: 120px; padding: 8px 10px;" />
+          <input type="text" id="adminAddName" placeholder="이름 (전화/방문 대리등록)" style="flex: 1; min-width: 150px; padding: 8px 10px;" />
+          <button class="btn btn-primary btn-sm" type="button" onclick="adminAddReservation()">+ 대리 등록</button>
+        </div>
+
+        <div class="toolbar" style="margin-bottom: 10px;">
+          <button class="btn btn-outline btn-sm" type="button" onclick="setFilter('ALL')">전체</button>
+          <button class="btn btn-outline btn-sm" type="button" onclick="setFilter('CONFIRMED')">확정만</button>
+          <button class="btn btn-outline btn-sm" type="button" onclick="setFilter('WAITLIST')">대기만</button>
+          <button class="btn btn-outline btn-sm" type="button" onclick="setFilter('CANCELED')">취소내역</button>
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>순번</th>
+                <th>상태</th>
+                <th>부서</th>
+                <th>이름</th>
+                <th>신청시각</th>
+                <th>식사여부</th>
+                <th>관리</th>
+              </tr>
+            </thead>
+            <tbody id="adminTableBody"></tbody>
+          </table>
         </div>
       </div>
     </section>
-
-    <!-- [03] 배포 메모 -->
-    <footer id="deploy-notes" class="card">
-      <div class="section-head">
-        <h2>GitHub 배포 및 이미지 경로 안내</h2>
-        <span class="section-code">INDEX-03 · DEPLOY</span>
-      </div>
-      <ol class="guide-list">
-        <li><code>index.html</code>과 같은 폴더에 이미지 파일(<code>스크린샷 2026-11-27 101814.jpg</code> 또는 영문 파일명 예: <code>avatar.jpg</code>)을 함께 업로드하고, <code>&lt;img class="user-emoji-avatar" src="..."&gt;</code>의 <code>src</code>를 파일명과 일치시켜 주세요.</li>
-        <li>원형 이모지 크기나 테두리 색상을 바꾸고 싶다면 CSS의 <code>.user-emoji-avatar</code>에서 <code>width</code>/<code>height</code>와 <code>border-color</code>를 수정하면 됩니다.</li>
-        <li>GitHub 저장소 <strong>Settings &gt; Pages</strong>에서 배포하면 최상단 헤더의 사용자 이모지와 게시판 리스트가 바로 표시됩니다.</li>
-      </ol>
-    </footer>
-  </main>
-
-  <canvas id="decodeCanvas" style="display: none;"></canvas>
+  </div>
 
   <script>
-    // [00] & [01] 게시판 검색 및 분류 필터
-    const boardSearch = document.getElementById("boardSearch");
-    const pillBtns = Array.from(document.querySelectorAll(".pill-btn"));
-    const boardRows = Array.from(document.querySelectorAll("#boardTbody tr"));
-    let activeCat = "all";
+    const MAX_CAPACITY = 150;
+    const ADMIN_PW = "1234";
+    const STORAGE_KEY = "cafeteria_reservations_index_v1";
 
-    function filterBoard() {
-      const query = boardSearch.value.trim().toLowerCase();
-      boardRows.forEach((row) => {
-        const cat = row.dataset.cat || "";
-        const text = (row.textContent + " " + (row.dataset.keywords || "")).toLowerCase();
-        const catMatch = activeCat === "all" || cat === activeCat;
-        const textMatch = !query || text.includes(query);
-        row.style.display = catMatch && textMatch ? "" : "none";
-      });
+    let memoryFallback = [];
+    let isAdminAuthenticated = false;
+    let currentFilter = "ALL";
+
+    function getTodayStr() {
+      const now = new Date();
+      const offset = now.getTimezoneOffset() * 60000;
+      return new Date(now - offset).toISOString().split("T")[0];
     }
 
-    boardSearch.addEventListener("input", filterBoard);
-
-    pillBtns.forEach((btn) => {
-      btn.addEventListener("click", () => {
-        pillBtns.forEach((b) => b.classList.remove("active"));
-        btn.classList.add("active");
-        activeCat = btn.dataset.cat;
-        filterBoard();
-      });
-    });
-
-    // [02] QR 탭 전환
-    const qrTabGenBtn = document.getElementById("qrTabGenBtn");
-    const qrTabReadBtn = document.getElementById("qrTabReadBtn");
-    const qrPanelGen = document.getElementById("qrPanelGen");
-    const qrPanelRead = document.getElementById("qrPanelRead");
-
-    function openQrTab(mode) {
-      const isGen = mode === "generate";
-      qrTabGenBtn.classList.toggle("active", isGen);
-      qrTabGenBtn.setAttribute("aria-selected", String(isGen));
-      qrPanelGen.classList.toggle("active", isGen);
-
-      qrTabReadBtn.classList.toggle("active", !isGen);
-      qrTabReadBtn.setAttribute("aria-selected", String(!isGen));
-      qrPanelRead.classList.toggle("active", !isGen);
-    }
-
-    qrTabGenBtn.addEventListener("click", () => openQrTab("generate"));
-    qrTabReadBtn.addEventListener("click", () => openQrTab("read"));
-
-    // QR 자동 생성
-    const linkInput = document.getElementById("linkInput");
-    const qrCodeContainer = document.getElementById("qrCodeContainer");
-    const qrPlaceholder = document.getElementById("qrPlaceholder");
-    const downloadQrBtn = document.getElementById("downloadQrBtn");
-    const clearQrBtn = document.getElementById("clearQrBtn");
-
-    function renderQRCode(rawValue) {
-      const value = rawValue.trim();
-      qrCodeContainer.innerHTML = "";
-
-      if (!value) {
-        qrCodeContainer.style.display = "none";
-        qrPlaceholder.style.display = "block";
-        downloadQrBtn.disabled = true;
-        return;
-      }
-
-      qrPlaceholder.style.display = "none";
-      qrCodeContainer.style.display = "inline-flex";
-
-      new QRCode(qrCodeContainer, {
-        text: value,
-        width: 192,
-        height: 192,
-        colorDark: "#0f172a",
-        colorLight: "#ffffff",
-        correctLevel: QRCode.CorrectLevel.M
-      });
-
-      downloadQrBtn.disabled = false;
-    }
-
-    linkInput.addEventListener("input", (e) => renderQRCode(e.target.value));
-
-    clearQrBtn.addEventListener("click", () => {
-      linkInput.value = "";
-      renderQRCode("");
-      linkInput.focus();
-    });
-
-    downloadQrBtn.addEventListener("click", () => {
-      const canvas = qrCodeContainer.querySelector("canvas");
-      const img = qrCodeContainer.querySelector("img");
-      const dataUrl = canvas ? canvas.toDataURL("image/png") : (img && img.src ? img.src : "");
-      if (!dataUrl) return;
-      const a = document.createElement("a");
-      a.href = dataUrl;
-      a.download = "qrcode.png";
-      a.click();
-    });
-
-    // 이미지 업로드로 QR 읽기
-    const dropzone = document.getElementById("dropzone");
-    const fileInput = document.getElementById("fileInput");
-    const uploadedPreviewWrap = document.getElementById("uploadedPreviewWrap");
-    const uploadedPreview = document.getElementById("uploadedPreview");
-    const decodeCanvas = document.getElementById("decodeCanvas");
-    const readStatus = document.getElementById("readStatus");
-    const decodedOutput = document.getElementById("decodedOutput");
-    const copyDecodedBtn = document.getElementById("copyDecodedBtn");
-    const openDecodedLink = document.getElementById("openDecodedLink");
-    let currentDecodedText = "";
-
-    function isValidHttpUrl(text) {
+    function getReservations() {
       try {
-        const parsed = new URL(text);
-        return parsed.protocol === "http:" || parsed.protocol === "https:";
-      } catch {
-        return false;
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return [...memoryFallback];
+        const parsed = JSON.parse(raw);
+        return Array.isArray(parsed) ? parsed : [...memoryFallback];
+      } catch (e) {
+        return [...memoryFallback];
       }
     }
 
-    function decodeImageFile(file) {
-      if (!file || !file.type.startsWith("image/")) {
-        readStatus.textContent = "오류 · 이미지 파일만 지원합니다.";
-        readStatus.className = "result-status err";
+    function saveReservations(data) {
+      memoryFallback = [...data];
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+      } catch (e) {
+        // 스토리지 접근 제한 환경에서도 메모리 상태로 유지
+      }
+    }
+
+    function isWithinBookingHours() {
+      const toggle = document.getElementById("testModeToggle");
+      if (toggle && toggle.checked) return true;
+      const hour = new Date().getHours();
+      return hour >= 10 && hour < 12;
+    }
+
+    function rebalanceQueue(dateStr) {
+      const all = getReservations();
+      const dayList = all.filter((r) => r.date === dateStr);
+      const otherList = all.filter((r) => r.date !== dateStr);
+
+      const active = dayList
+        .filter((r) => r.status !== "CANCELED")
+        .sort((a, b) => a.timestamp - b.timestamp);
+
+      const canceled = dayList.filter((r) => r.status === "CANCELED");
+
+      active.forEach((item, index) => {
+        if (index < MAX_CAPACITY) {
+          item.status = "CONFIRMED";
+          item.waitNumber = null;
+        } else {
+          item.status = "WAITLIST";
+          item.waitNumber = index - MAX_CAPACITY + 1;
+        }
+      });
+
+      saveReservations([...otherList, ...active, ...canceled]);
+    }
+
+    function handleReserve(customDept = null, customName = null, targetDate = null) {
+      const isAdminAction = customDept !== null;
+      if (!isAdminAction && !isWithinBookingHours()) {
+        alert("예약 가능 시간(오전 10:00 ~ 12:00)이 아닙니다.");
         return;
       }
 
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        const img = new Image();
-        img.onload = () => {
-          uploadedPreview.src = event.target.result;
-          uploadedPreviewWrap.classList.add("visible");
+      const dept = (customDept ?? document.getElementById("userDept").value).trim();
+      const name = (customName ?? document.getElementById("userName").value).trim();
+      const dateStr = targetDate || getTodayStr();
 
-          const ctx = decodeCanvas.getContext("2d", { willReadFrequently: true });
-          decodeCanvas.width = img.naturalWidth;
-          decodeCanvas.height = img.naturalHeight;
-          ctx.drawImage(img, 0, 0);
+      if (!dept || !name) {
+        alert("부서명과 이름을 모두 입력해주세요.");
+        return;
+      }
 
-          const imageData = ctx.getImageData(0, 0, decodeCanvas.width, decodeCanvas.height);
-          const code = jsQR(imageData.data, imageData.width, imageData.height, {
-            inversionAttempts: "attemptBoth"
-          });
+      const all = getReservations();
+      const activeDuplicate = all.find(
+        (r) => r.date === dateStr && r.dept === dept && r.name === name && r.status !== "CANCELED"
+      );
+      if (activeDuplicate) {
+        alert("이미 예약(또는 대기) 중인 내역이 있습니다.");
+        return;
+      }
 
-          if (code && code.data) {
-            currentDecodedText = code.data;
-            readStatus.textContent = "인식 성공 · QR 코드에서 링크를 추출했습니다.";
-            readStatus.className = "result-status ok";
-
-            if (isValidHttpUrl(currentDecodedText)) {
-              decodedOutput.innerHTML = `<a class="decoded-link" href="${encodeURI(currentDecodedText)}" target="_blank" rel="noopener noreferrer">${currentDecodedText}</a>`;
-              openDecodedLink.href = encodeURI(currentDecodedText);
-              openDecodedLink.style.display = "inline-flex";
-            } else {
-              decodedOutput.innerHTML = `<span class="decoded-link">${currentDecodedText}</span>`;
-              openDecodedLink.style.display = "none";
-            }
-            copyDecodedBtn.disabled = false;
-          } else {
-            currentDecodedText = "";
-            readStatus.textContent = "인식 실패 · 이미지에서 QR 코드를 찾지 못했습니다.";
-            readStatus.className = "result-status err";
-            decodedOutput.innerHTML = `<span class="placeholder-text">추출된 링크가 없습니다.</span>`;
-            copyDecodedBtn.disabled = true;
-            openDecodedLink.style.display = "none";
-          }
-        };
-        img.src = event.target.result;
+      const now = new Date();
+      const newEntry = {
+        id: `${Date.now()}_${Math.random().toString(36).slice(2, 7)}`,
+        date: dateStr,
+        dept,
+        name,
+        status: "CONFIRMED",
+        waitNumber: null,
+        timestamp: Date.now(),
+        timeStr: now.toLocaleTimeString("ko-KR", {
+          hour: "2-digit",
+          minute: "2-digit",
+          second: "2-digit"
+        }),
+        ate: false
       };
-      reader.readAsDataURL(file);
+
+      all.push(newEntry);
+      saveReservations(all);
+      rebalanceQueue(dateStr);
+
+      const updated = getReservations().find((r) => r.id === newEntry.id);
+      if (updated && updated.status === "CONFIRMED") {
+        alert(`[${dept} ${name}] 식사 예약이 확정되었습니다.`);
+      } else if (updated) {
+        alert(`정원(150명)이 마감되어 [대기 ${updated.waitNumber}번]으로 등록되었습니다.`);
+      }
+
+      if (!isAdminAction) {
+        document.getElementById("searchName").value = name;
+        document.getElementById("userName").value = "";
+      }
+      renderAll();
     }
 
-    dropzone.addEventListener("click", () => fileInput.click());
-    dropzone.addEventListener("keydown", (e) => {
-      if (e.key === "Enter" || e.key === " ") {
-        e.preventDefault();
-        fileInput.click();
+    function cancelReservation(id, byAdmin = false) {
+      if (!byAdmin && !isWithinBookingHours()) {
+        alert("본인 취소는 오전 10:00 ~ 12:00 사이에만 가능합니다. 이후에는 관리자에게 문의하세요.");
+        return;
       }
-    });
-    fileInput.addEventListener("change", (e) => {
-      if (e.target.files && e.target.files[0]) decodeImageFile(e.target.files[0]);
-    });
-    dropzone.addEventListener("dragover", (e) => {
-      e.preventDefault();
-      dropzone.classList.add("dragover");
-    });
-    dropzone.addEventListener("dragleave", () => dropzone.classList.remove("dragover"));
-    dropzone.addEventListener("drop", (e) => {
-      e.preventDefault();
-      dropzone.classList.remove("dragover");
-      const file = e.dataTransfer.files && e.dataTransfer.files[0];
-      if (file) decodeImageFile(file);
-    });
+      if (!confirm("예약을 취소하시겠습니까? 취소 시 대기 순번이 자동으로 조정됩니다.")) {
+        return;
+      }
 
-    copyDecodedBtn.addEventListener("click", async () => {
-      if (!currentDecodedText) return;
-      try {
-        await navigator.clipboard.writeText(currentDecodedText);
-        copyDecodedBtn.textContent = "복사 완료";
-        setTimeout(() => { copyDecodedBtn.textContent = "링크 복사"; }, 1400);
-      } catch {
-        const temp = document.createElement("input");
-        temp.value = currentDecodedText;
-        document.body.appendChild(temp);
-        temp.select();
-        document.execCommand("copy");
-        document.body.removeChild(temp);
+      const all = getReservations();
+      const target = all.find((r) => r.id === id);
+      if (!target) return;
+
+      target.status = "CANCELED";
+      target.waitNumber = null;
+      target.ate = false;
+      saveReservations(all);
+
+      rebalanceQueue(target.date);
+      renderAll();
+    }
+
+    function restoreReservation(id) {
+      const all = getReservations();
+      const target = all.find((r) => r.id === id);
+      if (!target) return;
+
+      target.status = "CONFIRMED";
+      target.timestamp = Date.now();
+      saveReservations(all);
+      rebalanceQueue(target.date);
+      renderAll();
+    }
+
+    function toggleAte(id) {
+      const all = getReservations();
+      const target = all.find((r) => r.id === id);
+      if (target) {
+        target.ate = !target.ate;
+        saveReservations(all);
+        renderAdminTable();
       }
-    });
+    }
+
+    function switchTab(tab) {
+      if (tab === "admin") {
+        if (!isAdminAuthenticated) {
+          const pw = prompt("관리자 비밀번호를 입력하세요 (초기 비밀번호: 1234)");
+          if (pw !== ADMIN_PW) {
+            alert("비밀번호가 일치하지 않습니다.");
+            return;
+          }
+          isAdminAuthenticated = true;
+        }
+        document.getElementById("userView").classList.add("hidden");
+        document.getElementById("adminView").classList.remove("hidden");
+        document.getElementById("tabAdmin").classList.add("active");
+        document.getElementById("tabUser").classList.remove("active");
+      } else {
+        document.getElementById("adminView").classList.add("hidden");
+        document.getElementById("userView").classList.remove("hidden");
+        document.getElementById("tabUser").classList.add("active");
+        document.getElementById("tabAdmin").classList.remove("active");
+      }
+      renderAll();
+    }
+
+    function adminAddReservation() {
+      const dept = document.getElementById("adminAddDept").value;
+      const name = document.getElementById("adminAddName").value;
+      const dateStr = document.getElementById("adminDateFilter").value || getTodayStr();
+      handleReserve(dept, name, dateStr);
+      document.getElementById("adminAddDept").value = "";
+      document.getElementById("adminAddName").value = "";
+    }
+
+    function setFilter(filter) {
+      currentFilter = filter;
+      renderAdminTable();
+    }
+
+    function renderAll() {
+      const today = getTodayStr();
+      document.getElementById("todayDateLabel").textContent = today;
+      const dateInput = document.getElementById("adminDateFilter");
+      if (!dateInput.value) {
+        dateInput.value = today;
+      }
+
+      const canBook = isWithinBookingHours();
+      const timeStatus = document.getElementById("timeStatusText");
+      const reserveBtn = document.getElementById("reserveBtn");
+
+      const todayList = getReservations().filter((r) => r.date === today);
+      const confirmed = todayList.filter((r) => r.status === "CONFIRMED");
+      const waitlist = todayList.filter((r) => r.status === "WAITLIST");
+
+      document.getElementById("confirmedCount").textContent = confirmed.length;
+      document.getElementById("remainingCount").textContent = Math.max(0, MAX_CAPACITY - confirmed.length);
+      document.getElementById("waitlistCount").textContent = waitlist.length;
+
+      const percent = Math.min(100, (confirmed.length / MAX_CAPACITY) * 100);
+      const bar = document.getElementById("capacityBar");
+      bar.style.width = `${percent}%`;
+      bar.classList.toggle("full", confirmed.length >= MAX_CAPACITY);
+
+      if (canBook) {
+        timeStatus.innerHTML = `<span style="color: var(--success); font-weight: 700;">● 접수 중</span>`;
+        reserveBtn.disabled = false;
+        if (confirmed.length >= MAX_CAPACITY) {
+          reserveBtn.textContent = `정원 마감 - 대기 신청하기 (현재 대기 ${waitlist.length}명)`;
+          reserveBtn.className = "btn btn-warning";
+        } else {
+          reserveBtn.textContent = "식사 예약하기";
+          reserveBtn.className = "btn btn-primary";
+        }
+      } else {
+        timeStatus.innerHTML = `<span style="color: var(--danger); font-weight: 700;">● 접수 마감 (10:00 ~ 12:00)</span>`;
+        reserveBtn.disabled = true;
+        reserveBtn.textContent = "예약 가능 시간이 아닙니다 (10:00 ~ 12:00)";
+        reserveBtn.className = "btn";
+      }
+
+      renderMyReservation();
+      renderAdminTable();
+    }
+
+    function renderMyReservation() {
+      const keyword = document.getElementById("searchName").value.trim();
+      const box = document.getElementById("myReservationBox");
+      if (!keyword) {
+        box.innerHTML = "";
+        return;
+      }
+
+      const today = getTodayStr();
+      const matches = getReservations().filter(
+        (r) => r.date === today && r.name.includes(keyword) && r.status !== "CANCELED"
+      );
+
+      if (matches.length === 0) {
+        box.innerHTML = `<p class="notice">오늘 날짜로 조회된 예약/대기 내역이 없습니다.</p>`;
+        return;
+      }
+
+      box.innerHTML = matches
+        .map(
+          (r) => `
+          <div class="my-ticket">
+            <div>
+              <strong>${r.dept} ${r.name}</strong>
+              <div style="margin-top: 4px;">
+                ${
+                  r.status === "CONFIRMED"
+                    ? `<span class="badge badge-confirmed">예약 확정</span>`
+                    : `<span class="badge badge-waitlist">대기 ${r.waitNumber}번</span>`
+                }
+                <span style="font-size: 0.8rem; color: var(--muted); margin-left: 6px;">신청: ${r.timeStr}</span>
+              </div>
+            </div>
+            <button class="btn btn-danger btn-sm" type="button" onclick="cancelReservation('${r.id}', false)">예약 취소</button>
+          </div>
+        `
+        )
+        .join("");
+    }
+
+    function renderAdminTable() {
+      const dateStr = document.getElementById("adminDateFilter").value || getTodayStr();
+      let list = getReservations()
+        .filter((r) => r.date === dateStr)
+        .sort((a, b) => a.timestamp - b.timestamp);
+
+      if (currentFilter !== "ALL") {
+        list = list.filter((r) => r.status === currentFilter);
+      }
+
+      const tbody = document.getElementById("adminTableBody");
+      if (list.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: var(--muted); padding: 24px;">데이터가 없습니다.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = list
+        .map((r, idx) => {
+          let badge = "";
+          if (r.status === "CONFIRMED") badge = `<span class="badge badge-confirmed">확정</span>`;
+          else if (r.status === "WAITLIST") badge = `<span class="badge badge-waitlist">대기 ${r.waitNumber}번</span>`;
+          else badge = `<span class="badge badge-canceled">취소됨</span>`;
+
+          return `
+            <tr>
+              <td>${idx + 1}</td>
+              <td>${badge}</td>
+              <td>${r.dept}</td>
+              <td><strong>${r.name}</strong></td>
+              <td>${r.timeStr}</td>
+              <td>
+                ${
+                  r.status === "CONFIRMED"
+                    ? `<input type="checkbox" ${r.ate ? "checked" : ""} onchange="toggleAte('${r.id}')" />`
+                    : "-"
+                }
+              </td>
+              <td>
+                ${
+                  r.status !== "CANCELED"
+                    ? `<button class="btn btn-danger btn-sm" type="button" onclick="cancelReservation('${r.id}', true)">취소</button>`
+                    : `<button class="btn btn-outline btn-sm" type="button" onclick="restoreReservation('${r.id}')">복구</button>`
+                }
+              </td>
+            </tr>
+          `;
+        })
+        .join("");
+    }
+
+    function buildRowsForDate(dateStr) {
+      return getReservations()
+        .filter((r) => r.date === dateStr)
+        .sort((a, b) => a.timestamp - b.timestamp);
+    }
+
+    function copyListForExcel() {
+      const dateStr = document.getElementById("adminDateFilter").value || getTodayStr();
+      const list = buildRowsForDate(dateStr);
+      if (list.length === 0) {
+        alert("복사할 데이터가 없습니다.");
+        return;
+      }
+
+      const lines = ["날짜\t상태\t대기순번\t부서\t이름\t신청시각\t식사여부"];
+      list.forEach((r) => {
+        const statusKo = r.status === "CONFIRMED" ? "확정" : r.status === "WAITLIST" ? "대기" : "취소";
+        lines.push(`${r.date}\t${statusKo}\t${r.waitNumber || ""}\t${r.dept}\t${r.name}\t${r.timeStr}\t${r.ate ? "O" : "X"}`);
+      });
+
+      navigator.clipboard
+        .writeText(lines.join("\n"))
+        .then(() => alert("명단이 복사되었습니다. 엑셀에 바로 붙여넣기(Ctrl+V) 하세요."))
+        .catch(() => alert("클립보드 복사에 실패했습니다. CSV 다운로드를 이용해 주세요."));
+    }
+
+    function exportCSV() {
+      const dateStr = document.getElementById("adminDateFilter").value || getTodayStr();
+      const list = buildRowsForDate(dateStr);
+      if (list.length === 0) {
+        alert("다운로드할 데이터가 없습니다.");
+        return;
+      }
+
+      let csv = "\uFEFF날짜,상태,대기순번,부서,이름,신청시각,식사여부\n";
+      list.forEach((r) => {
+        const statusKo = r.status === "CONFIRMED" ? "확정" : r.status === "WAITLIST" ? "대기" : "취소";
+        csv += `${r.date},${statusKo},${r.waitNumber || ""},${r.dept},${r.name},${r.timeStr},${r.ate ? "O" : "X"}\n`;
+      });
+
+      const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = `구내식당_예약명단_${dateStr}.csv`;
+      link.click();
+    }
+
+    renderAll();
+    setInterval(renderAll, 10000);
   </script>
 </body>
 </html>
