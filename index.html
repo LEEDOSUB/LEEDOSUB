@@ -33,7 +33,7 @@
     }
 
     .container {
-      max-width: 880px;
+      max-width: 900px;
       margin: 0 auto;
     }
 
@@ -157,6 +157,28 @@
       gap: 8px;
     }
 
+    .menu-box {
+      margin-top: 14px;
+      padding: 16px;
+      border-radius: 12px;
+      background: #eff6ff;
+      border: 1px solid #bfdbfe;
+    }
+
+    .menu-title {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--primary);
+      margin-bottom: 6px;
+    }
+
+    .menu-items {
+      font-size: 1.08rem;
+      font-weight: 700;
+      color: var(--text);
+      word-break: keep-all;
+    }
+
     .status-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
@@ -212,7 +234,7 @@
 
     .form-group {
       display: grid;
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: 1fr 1fr 130px;
       gap: 12px;
       margin-bottom: 14px;
     }
@@ -420,10 +442,15 @@
     <section id="userView">
       <div class="card">
         <div class="card-header">
-          <h2 style="font-size: 1.18rem;">오늘의 식수 현황 (<span id="todayDateLabel"></span>)</h2>
+          <h2 style="font-size: 1.18rem;">오늘의 메뉴 (<span id="todayDateLabel"></span>)</h2>
           <span style="font-size: 0.85rem; color: var(--muted);">
             확정 정원 <strong id="userCapacityLabel">150</strong>명 · 초과 시 자동 대기
           </span>
+        </div>
+
+        <div class="menu-box">
+          <div class="menu-title">🍽️ 중식 제공 메뉴</div>
+          <div class="menu-items" id="todayMenuText">소고기무국, 제육볶음, 계란말이, 배추김치, 흑미밥</div>
         </div>
 
         <div class="status-grid">
@@ -446,14 +473,24 @@
         </div>
 
         <div class="form-group">
-          <input type="text" id="userDept" placeholder="부서명 (예: 기획감사실, 총무과)" autocomplete="off" />
-          <input type="text" id="userName" placeholder="이름 (예: 홍길동)" autocomplete="off" />
+          <div>
+            <label class="field-label" for="userDept">부서명</label>
+            <input type="text" id="userDept" placeholder="예: 기획감사실, 총무과" autocomplete="off" />
+          </div>
+          <div>
+            <label class="field-label" for="userName">대표 신청자 이름</label>
+            <input type="text" id="userName" placeholder="예: 홍길동" autocomplete="off" />
+          </div>
+          <div>
+            <label class="field-label" for="userPartySize">예약 인원 (명)</label>
+            <input type="number" id="userPartySize" min="1" max="30" value="1" />
+          </div>
         </div>
 
         <button class="btn btn-primary" id="reserveBtn" type="button" onclick="handleReserve()">식사 예약하기</button>
         <p class="notice">
-          ※ 접수 시간(<span id="noticeTimeRange">10:00 ~ 12:00</span>) 내 신청 가능하며, 확정 정원(<span id="noticeCapacity">150</span>명) 초과 시 '대기'로 등록됩니다.<br />
-          ※ 확정자 취소 시 대기 1번부터 자동 확정되며, 취소 후 재신청 시 신청 시각 기준으로 맨 뒤 순번에 등록됩니다.
+          ※ 한 명이 여러 명(동반·팀 단위)을 함께 예약할 수 있으며, 신청 인원수만큼 확정 또는 대기 순번이 배정됩니다.<br />
+          ※ 접수 시간(<span id="noticeTimeRange">10:00 ~ 12:00</span>) 내 신청 가능하며, 확정자 취소 시 대기 1번부터 자동 확정됩니다.
         </p>
       </div>
 
@@ -466,13 +503,22 @@
 
     <!-- 관리자 화면 -->
     <section id="adminView" class="hidden">
-      <!-- 운영 설정 (예약시간 및 확정 인원 변경) -->
+      <!-- 운영 설정 (예약시간, 확정 인원, 오늘의 메뉴 변경) -->
       <div class="card">
         <div class="card-header">
-          <h2 style="font-size: 1.15rem;">⚙️ 예약 시간 및 확정 인원 설정</h2>
+          <h2 style="font-size: 1.15rem;">⚙️ 오늘의 메뉴 · 예약 시간 · 확정 인원 설정</h2>
           <span style="font-size: 0.85rem; color: var(--muted);">
             현재 적용: <strong id="currentConfigSummary">10:00 ~ 12:00 / 정원 150명</strong>
           </span>
+        </div>
+
+        <div style="margin-top: 12px; margin-bottom: 12px;">
+          <label class="field-label" for="cfgTodayMenu">오늘의 메뉴</label>
+          <input
+            type="text"
+            id="cfgTodayMenu"
+            placeholder="예: 소고기무국, 제육볶음, 계란말이, 배추김치, 흑미밥"
+          />
         </div>
 
         <div class="settings-grid">
@@ -492,10 +538,10 @@
 
         <div class="toolbar">
           <button class="btn btn-primary btn-sm" type="button" onclick="saveSettings()">설정 저장 및 명단 반영</button>
-          <button class="btn btn-outline btn-sm" type="button" onclick="resetSettings()">기본값 복원 (10:00~12:00, 150명)</button>
+          <button class="btn btn-outline btn-sm" type="button" onclick="resetSettings()">기본값 복원</button>
         </div>
         <p class="notice">
-          ※ 확정 인원을 줄이거나 늘리면 기존 유효 신청자(확정/대기) 순번이 새 정원에 맞춰 즉시 재조정됩니다.
+          ※ 설정 저장 시 오늘의 메뉴와 접수 시간, 확정 정원이 즉시 반영되며 기존 신청자 순번도 새 정원에 맞춰 재조정됩니다.
         </p>
       </div>
 
@@ -512,7 +558,8 @@
 
         <div style="background: var(--bg); padding: 12px; border-radius: 10px; margin-bottom: 14px; display: flex; gap: 8px; flex-wrap: wrap;">
           <input type="text" id="adminAddDept" placeholder="부서명 (예: 재무과)" style="flex: 1; min-width: 120px; padding: 8px 10px;" />
-          <input type="text" id="adminAddName" placeholder="이름 (전화/방문 대리등록)" style="flex: 1; min-width: 150px; padding: 8px 10px;" />
+          <input type="text" id="adminAddName" placeholder="대표자 이름 (대리등록)" style="flex: 1; min-width: 140px; padding: 8px 10px;" />
+          <input type="number" id="adminAddPartySize" min="1" max="30" value="1" placeholder="인원" style="width: 90px; padding: 8px 10px;" />
           <button class="btn btn-primary btn-sm" type="button" onclick="adminAddReservation()">+ 대리 등록</button>
         </div>
 
@@ -530,7 +577,8 @@
                 <th>순번</th>
                 <th>상태</th>
                 <th>부서</th>
-                <th>이름</th>
+                <th>신청자</th>
+                <th>인원</th>
                 <th>신청시각</th>
                 <th>식사여부</th>
                 <th>관리</th>
@@ -544,14 +592,16 @@
   </div>
 
   <script>
+    const DEFAULT_MENU = "소고기무국, 제육볶음, 계란말이, 배추김치, 흑미밥";
     const DEFAULT_CONFIG = {
       startTime: "10:00",
       endTime: "12:00",
-      maxCapacity: 150
+      maxCapacity: 150,
+      todayMenu: DEFAULT_MENU
     };
     const ADMIN_PW = "1234";
-    const DATA_STORAGE_KEY = "hoengseong_cafeteria_reservations_v1";
-    const CONFIG_STORAGE_KEY = "hoengseong_cafeteria_config_v1";
+    const DATA_STORAGE_KEY = "hoengseong_cafeteria_reservations_v2";
+    const CONFIG_STORAGE_KEY = "hoengseong_cafeteria_config_v2";
 
     let memoryReservations = [];
     let memoryConfig = { ...DEFAULT_CONFIG };
@@ -571,10 +621,14 @@
         if (!raw) return { ...memoryConfig };
         const parsed = JSON.parse(raw);
         const cap = Number(parsed.maxCapacity);
+        const menuStr = typeof parsed.todayMenu === "string" && parsed.todayMenu.trim()
+          ? parsed.todayMenu.trim()
+          : DEFAULT_CONFIG.todayMenu;
         return {
           startTime: typeof parsed.startTime === "string" && parsed.startTime ? parsed.startTime : DEFAULT_CONFIG.startTime,
           endTime: typeof parsed.endTime === "string" && parsed.endTime ? parsed.endTime : DEFAULT_CONFIG.endTime,
-          maxCapacity: Number.isFinite(cap) && cap >= 1 ? Math.floor(cap) : DEFAULT_CONFIG.maxCapacity
+          maxCapacity: Number.isFinite(cap) && cap >= 1 ? Math.floor(cap) : DEFAULT_CONFIG.maxCapacity,
+          todayMenu: menuStr
         };
       } catch (e) {
         return { ...memoryConfig };
@@ -633,6 +687,7 @@
       return currentMin >= startMin && currentMin <= endMin;
     }
 
+    // 신청 건 단위(인원수 partySize 포함)로 확정/대기 배정 및 대기 1번 승격 재계산
     function rebalanceQueue(dateStr) {
       const cfg = getConfig();
       const cap = cfg.maxCapacity;
@@ -646,13 +701,36 @@
 
       const canceled = dayList.filter((r) => r.status === "CANCELED");
 
-      active.forEach((item, index) => {
-        if (index < cap) {
+      let usedSeats = 0;
+      let currentWaitSeat = 0;
+
+      active.forEach((item) => {
+        const size = Math.max(1, Number(item.partySize) || 1);
+        item.partySize = size;
+
+        if (usedSeats + size <= cap) {
           item.status = "CONFIRMED";
-          item.waitNumber = null;
+          item.confirmedCount = size;
+          item.waitCount = 0;
+          item.waitStartNumber = null;
+          usedSeats += size;
+        } else if (usedSeats < cap) {
+          // 일부 좌석이 남은 경우 남은 인원만큼 확정, 나머지는 대기로 분리
+          const remainingSeats = cap - usedSeats;
+          const waitPartSize = size - remainingSeats;
+
+          item.status = "PARTIAL";
+          item.confirmedCount = remainingSeats;
+          item.waitCount = waitPartSize;
+          item.waitStartNumber = currentWaitSeat + 1;
+          usedSeats = cap;
+          currentWaitSeat += waitPartSize;
         } else {
           item.status = "WAITLIST";
-          item.waitNumber = index - cap + 1;
+          item.confirmedCount = 0;
+          item.waitCount = size;
+          item.waitStartNumber = currentWaitSeat + 1;
+          currentWaitSeat += size;
         }
       });
 
@@ -669,6 +747,7 @@
       if (!isAdminAuthenticated) return;
       if (settingsFormInitialized && !force) return;
       const cfg = getConfig();
+      document.getElementById("cfgTodayMenu").value = cfg.todayMenu;
       document.getElementById("cfgStartTime").value = cfg.startTime;
       document.getElementById("cfgEndTime").value = cfg.endTime;
       document.getElementById("cfgMaxCapacity").value = cfg.maxCapacity;
@@ -676,6 +755,7 @@
     }
 
     function saveSettings() {
+      const todayMenu = document.getElementById("cfgTodayMenu").value.trim() || DEFAULT_MENU;
       const startTime = document.getElementById("cfgStartTime").value;
       const endTime = document.getElementById("cfgEndTime").value;
       const capVal = Number(document.getElementById("cfgMaxCapacity").value);
@@ -697,6 +777,7 @@
       }
 
       saveConfig({
+        todayMenu,
         startTime,
         endTime,
         maxCapacity: Math.floor(capVal)
@@ -712,10 +793,10 @@
       rebalanceAllDates();
       syncSettingsInputs(true);
       renderAll();
-      alert("기본값(10:00 ~ 12:00, 정원 150명)으로 복원되었습니다.");
+      alert("기본값으로 복원되었습니다.");
     }
 
-    function handleReserve(customDept = null, customName = null, targetDate = null) {
+    function handleReserve(customDept = null, customName = null, customPartySize = null, targetDate = null) {
       const isAdminAction = customDept !== null;
       const cfg = getConfig();
 
@@ -726,10 +807,16 @@
 
       const dept = (customDept ?? document.getElementById("userDept").value).trim();
       const name = (customName ?? document.getElementById("userName").value).trim();
+      const rawSize = customPartySize ?? document.getElementById("userPartySize").value;
+      const partySize = Number(rawSize);
       const dateStr = targetDate || getTodayStr();
 
       if (!dept || !name) {
-        alert("부서명과 이름을 모두 입력해주세요.");
+        alert("부서명과 신청자 이름을 모두 입력해주세요.");
+        return;
+      }
+      if (!Number.isFinite(partySize) || partySize < 1 || partySize > 30) {
+        alert("예약 인원은 1명 이상 30명 이하로 입력해주세요.");
         return;
       }
 
@@ -748,8 +835,11 @@
         date: dateStr,
         dept,
         name,
+        partySize: Math.floor(partySize),
         status: "CONFIRMED",
-        waitNumber: null,
+        confirmedCount: Math.floor(partySize),
+        waitCount: 0,
+        waitStartNumber: null,
         timestamp: Date.now(),
         timeStr: now.toLocaleTimeString("ko-KR", {
           hour: "2-digit",
@@ -764,15 +854,24 @@
       rebalanceQueue(dateStr);
 
       const updated = getReservations().find((r) => r.id === newEntry.id);
-      if (updated && updated.status === "CONFIRMED") {
-        alert(`[${dept} ${name}] 횡성군청 구내식당 식사 예약이 확정되었습니다.`);
-      } else if (updated) {
-        alert(`확정 정원(${cfg.maxCapacity}명)이 마감되어 [대기 ${updated.waitNumber}번]으로 등록되었습니다.`);
+      if (updated) {
+        if (updated.status === "CONFIRMED") {
+          alert(`[${dept} ${name} / ${updated.partySize}명] 식사 예약이 확정되었습니다.`);
+        } else if (updated.status === "PARTIAL") {
+          alert(
+            `[${dept} ${name} / 총 ${updated.partySize}명] ${updated.confirmedCount}명은 확정되었고, ${updated.waitCount}명은 [대기 ${updated.waitStartNumber}번]부터 등록되었습니다.`
+          );
+        } else {
+          alert(
+            `확정 정원(${cfg.maxCapacity}명)이 마감되어 [${dept} ${name} / ${updated.partySize}명]이 [대기 ${updated.waitStartNumber}번]부터 등록되었습니다.`
+          );
+        }
       }
 
       if (!isAdminAction) {
         document.getElementById("searchName").value = name;
         document.getElementById("userName").value = "";
+        document.getElementById("userPartySize").value = "1";
       }
       renderAll();
     }
@@ -783,7 +882,7 @@
         alert(`본인 취소는 접수 시간(${cfg.startTime} ~ ${cfg.endTime}) 내에만 가능합니다. 이후에는 관리자에게 문의하세요.`);
         return;
       }
-      if (!confirm("예약을 취소하시겠습니까? 취소 시 대기 순번이 자동으로 조정됩니다.")) {
+      if (!confirm("해당 예약 건을 취소하시겠습니까? 취소 시 대기 순번이 자동으로 조정됩니다.")) {
         return;
       }
 
@@ -792,7 +891,9 @@
       if (!target) return;
 
       target.status = "CANCELED";
-      target.waitNumber = null;
+      target.confirmedCount = 0;
+      target.waitCount = 0;
+      target.waitStartNumber = null;
       target.ate = false;
       saveReservations(all);
 
@@ -849,10 +950,12 @@
     function adminAddReservation() {
       const dept = document.getElementById("adminAddDept").value;
       const name = document.getElementById("adminAddName").value;
+      const partySize = document.getElementById("adminAddPartySize").value;
       const dateStr = document.getElementById("adminDateFilter").value || getTodayStr();
-      handleReserve(dept, name, dateStr);
+      handleReserve(dept, name, partySize, dateStr);
       document.getElementById("adminAddDept").value = "";
       document.getElementById("adminAddName").value = "";
+      document.getElementById("adminAddPartySize").value = "1";
     }
 
     function setFilter(filter) {
@@ -867,9 +970,9 @@
       const timeRangeLabel = `${cfg.startTime} ~ ${cfg.endTime}`;
 
       document.getElementById("todayDateLabel").textContent = today;
+      document.getElementById("todayMenuText").textContent = cfg.todayMenu;
       document.getElementById("bannerTimeRange").textContent = timeRangeLabel;
       document.getElementById("noticeTimeRange").textContent = timeRangeLabel;
-      document.getElementById("noticeCapacity").textContent = cap;
       document.getElementById("userCapacityLabel").textContent = cap;
       document.getElementById("confirmedCapText").textContent = cap;
       document.getElementById("currentConfigSummary").textContent = `${timeRangeLabel} / 정원 ${cap}명`;
@@ -883,24 +986,24 @@
       const timeStatus = document.getElementById("timeStatusText");
       const reserveBtn = document.getElementById("reserveBtn");
 
-      const todayList = getReservations().filter((r) => r.date === today);
-      const confirmed = todayList.filter((r) => r.status === "CONFIRMED");
-      const waitlist = todayList.filter((r) => r.status === "WAITLIST");
+      const todayList = getReservations().filter((r) => r.date === today && r.status !== "CANCELED");
+      const confirmedTotal = todayList.reduce((sum, r) => sum + (Number(r.confirmedCount) || 0), 0);
+      const waitlistTotal = todayList.reduce((sum, r) => sum + (Number(r.waitCount) || 0), 0);
 
-      document.getElementById("confirmedCount").textContent = confirmed.length;
-      document.getElementById("remainingCount").textContent = Math.max(0, cap - confirmed.length);
-      document.getElementById("waitlistCount").textContent = waitlist.length;
+      document.getElementById("confirmedCount").textContent = confirmedTotal;
+      document.getElementById("remainingCount").textContent = Math.max(0, cap - confirmedTotal);
+      document.getElementById("waitlistCount").textContent = waitlistTotal;
 
-      const percent = Math.min(100, (confirmed.length / cap) * 100);
+      const percent = Math.min(100, (confirmedTotal / cap) * 100);
       const bar = document.getElementById("capacityBar");
       bar.style.width = `${percent}%`;
-      bar.classList.toggle("full", confirmed.length >= cap);
+      bar.classList.toggle("full", confirmedTotal >= cap);
 
       if (canBook) {
         timeStatus.innerHTML = `<span style="color: var(--success); font-weight: 700;">● 접수 중</span>`;
         reserveBtn.disabled = false;
-        if (confirmed.length >= cap) {
-          reserveBtn.textContent = `확정 정원 마감 - 대기 신청하기 (현재 대기 ${waitlist.length}명)`;
+        if (confirmedTotal >= cap) {
+          reserveBtn.textContent = `확정 정원 마감 - 대기 신청하기 (현재 대기 ${waitlistTotal}명)`;
           reserveBtn.className = "btn btn-warning";
         } else {
           reserveBtn.textContent = "식사 예약하기";
@@ -915,6 +1018,28 @@
 
       renderMyReservation();
       renderAdminTable();
+    }
+
+    function formatStatusBadge(r) {
+      if (r.status === "CONFIRMED") {
+        return `<span class="badge badge-confirmed">확정 ${r.partySize}명</span>`;
+      }
+      if (r.status === "PARTIAL") {
+        return `<span class="badge badge-confirmed">확정 ${r.confirmedCount}명</span> <span class="badge badge-waitlist">대기 ${r.waitStartNumber}번~ (${r.waitCount}명)</span>`;
+      }
+      if (r.status === "WAITLIST") {
+        const endNum = r.waitStartNumber + r.waitCount - 1;
+        const label = r.waitCount > 1 ? `대기 ${r.waitStartNumber}~${endNum}번` : `대기 ${r.waitStartNumber}번`;
+        return `<span class="badge badge-waitlist">${label}</span>`;
+      }
+      return `<span class="badge badge-canceled">취소됨</span>`;
+    }
+
+    function formatStatusText(r) {
+      if (r.status === "CONFIRMED") return `확정(${r.partySize}명)`;
+      if (r.status === "PARTIAL") return `일부확정(${r.confirmedCount}명)/대기(${r.waitCount}명)`;
+      if (r.status === "WAITLIST") return `대기(${r.waitCount}명)`;
+      return "취소";
     }
 
     function renderMyReservation() {
@@ -940,13 +1065,9 @@
           (r) => `
           <div class="my-ticket">
             <div>
-              <strong>${r.dept} ${r.name}</strong>
+              <strong>${r.dept} ${r.name}</strong> <span style="font-size: 0.9rem; color: var(--muted);">(${r.partySize}명)</span>
               <div style="margin-top: 4px;">
-                ${
-                  r.status === "CONFIRMED"
-                    ? `<span class="badge badge-confirmed">예약 확정</span>`
-                    : `<span class="badge badge-waitlist">대기 ${r.waitNumber}번</span>`
-                }
+                ${formatStatusBadge(r)}
                 <span style="font-size: 0.8rem; color: var(--muted); margin-left: 6px;">신청: ${r.timeStr}</span>
               </div>
             </div>
@@ -964,46 +1085,44 @@
         .sort((a, b) => a.timestamp - b.timestamp);
 
       if (currentFilter !== "ALL") {
-        list = list.filter((r) => r.status === currentFilter);
+        list = list.filter((r) => {
+          if (currentFilter === "CONFIRMED") return r.status === "CONFIRMED" || r.status === "PARTIAL";
+          if (currentFilter === "WAITLIST") return r.status === "WAITLIST" || r.status === "PARTIAL";
+          return r.status === currentFilter;
+        });
       }
 
       const tbody = document.getElementById("adminTableBody");
       if (list.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: var(--muted); padding: 24px;">데이터가 없습니다.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="8" style="text-align: center; color: var(--muted); padding: 24px;">데이터가 없습니다.</td></tr>`;
         return;
       }
 
       tbody.innerHTML = list
-        .map((r, idx) => {
-          let badge = "";
-          if (r.status === "CONFIRMED") badge = `<span class="badge badge-confirmed">확정</span>`;
-          else if (r.status === "WAITLIST") badge = `<span class="badge badge-waitlist">대기 ${r.waitNumber}번</span>`;
-          else badge = `<span class="badge badge-canceled">취소됨</span>`;
-
-          return `
-            <tr>
-              <td>${idx + 1}</td>
-              <td>${badge}</td>
-              <td>${r.dept}</td>
-              <td><strong>${r.name}</strong></td>
-              <td>${r.timeStr}</td>
-              <td>
-                ${
-                  r.status === "CONFIRMED"
-                    ? `<input type="checkbox" ${r.ate ? "checked" : ""} onchange="toggleAte('${r.id}')" />`
-                    : "-"
-                }
-              </td>
-              <td>
-                ${
-                  r.status !== "CANCELED"
-                    ? `<button class="btn btn-danger btn-sm" type="button" onclick="cancelReservation('${r.id}', true)">취소</button>`
-                    : `<button class="btn btn-outline btn-sm" type="button" onclick="restoreReservation('${r.id}')">복구</button>`
-                }
-              </td>
-            </tr>
-          `;
-        })
+        .map((r, idx) => `
+          <tr>
+            <td>${idx + 1}</td>
+            <td>${formatStatusBadge(r)}</td>
+            <td>${r.dept}</td>
+            <td><strong>${r.name}</strong></td>
+            <td>${r.partySize}명</td>
+            <td>${r.timeStr}</td>
+            <td>
+              ${
+                r.status === "CONFIRMED" || r.status === "PARTIAL"
+                  ? `<input type="checkbox" ${r.ate ? "checked" : ""} onchange="toggleAte('${r.id}')" />`
+                  : "-"
+              }
+            </td>
+            <td>
+              ${
+                r.status !== "CANCELED"
+                  ? `<button class="btn btn-danger btn-sm" type="button" onclick="cancelReservation('${r.id}', true)">취소</button>`
+                  : `<button class="btn btn-outline btn-sm" type="button" onclick="restoreReservation('${r.id}')">복구</button>`
+              }
+            </td>
+          </tr>
+        `)
         .join("");
     }
 
@@ -1021,10 +1140,11 @@
         return;
       }
 
-      const lines = ["날짜\t상태\t대기순번\t부서\t이름\t신청시각\t식사여부"];
+      const lines = ["날짜\t상태\t대기시작번호\t부서\t신청자\t인원\t신청시각\t식사여부"];
       list.forEach((r) => {
-        const statusKo = r.status === "CONFIRMED" ? "확정" : r.status === "WAITLIST" ? "대기" : "취소";
-        lines.push(`${r.date}\t${statusKo}\t${r.waitNumber || ""}\t${r.dept}\t${r.name}\t${r.timeStr}\t${r.ate ? "O" : "X"}`);
+        lines.push(
+          `${r.date}\t${formatStatusText(r)}\t${r.waitStartNumber || ""}\t${r.dept}\t${r.name}\t${r.partySize}\t${r.timeStr}\t${r.ate ? "O" : "X"}`
+        );
       });
 
       navigator.clipboard
@@ -1041,10 +1161,9 @@
         return;
       }
 
-      let csv = "\uFEFF날짜,상태,대기순번,부서,이름,신청시각,식사여부\n";
+      let csv = "\uFEFF날짜,상태,대기시작번호,부서,신청자,인원,신청시각,식사여부\n";
       list.forEach((r) => {
-        const statusKo = r.status === "CONFIRMED" ? "확정" : r.status === "WAITLIST" ? "대기" : "취소";
-        csv += `${r.date},${statusKo},${r.waitNumber || ""},${r.dept},${r.name},${r.timeStr},${r.ate ? "O" : "X"}\n`;
+        csv += `${r.date},${formatStatusText(r)},${r.waitStartNumber || ""},${r.dept},${r.name},${r.partySize},${r.timeStr},${r.ate ? "O" : "X"}\n`;
       });
 
       const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
