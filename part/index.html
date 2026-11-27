@@ -491,7 +491,7 @@
   <script>
     const MAX_CAPACITY = 150;
     const ADMIN_PW = "1234";
-    const STORAGE_KEY = "cafeteria_reservations_v2";
+    const STORAGE_KEY = "cafeteria_reservations_index_v1";
 
     let memoryFallback = [];
     let isAdminAuthenticated = false;
@@ -519,7 +519,7 @@
       try {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
       } catch (e) {
-        // 스토리지 제한 환경에서도 메모리 상태로 동작 유지
+        // 스토리지 접근 제한 환경에서도 메모리 상태로 유지
       }
     }
 
