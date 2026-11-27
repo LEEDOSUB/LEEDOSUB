@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>구내식당 식수 예약 시스템</title>
+  <style>
+    :root {
+      --primary: #2563eb;
+      --primary-hover: #1d4ed8;
+      --danger: #dc2626;
+      --warning: #d97706;
+      --success: #16a34a;
+      --bg: #f8fafc;
+      --card: #ffffff;
+      --border: #e2e8f0;
+      --text: #1e293b;
+      --muted: #64748b;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, sans-serif; }
+    body { background: var(--bg); color: var(--text); line-height: 1.5; padding: 20px; }
+    .container { max-width: 820px; margin: 0 auto; }
+
+    /* 헤더 & 탭 */
+    header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 12px; }
+    h1 { font-size: 1.5rem; font-weight: 700; display: flex; align-items: center; gap: 8px; }
+    .tabs { display: flex; gap: 8px; background: #e2e8f0; padding: 4px; border-radius: 10px; }
+    .tab-btn { border: none; background: transparent; padding: 8px 16px; border-radius: 8px; font-weight: 600; cursor: pointer; color: var(--muted); transition: 0.2s; }
+    .tab-btn.active { background: var(--card); color: var(--primary); box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+
+    /* 테스트 배너 */
+    .test-bar { background: #fef3c7; border: 1px solid #f59e0b; color: #92400e; padding: 10px 16px; border-radius: 10px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; font-size: 0.9rem; }
+    .switch { position: relative; display: inline-block; width: 44px; height: 24px; }
+    .switch input { opacity: 0; width: 0; height: 0; }
+    .slider { position: absolute; cursor: pointer; inset: 0; background-color: #cbd5e1; transition: .3s; border-radius: 24px; }
+    .slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; transition: .3s; border-radius: 50%; }
+    input:checked + .slider { background-color: #f59e0b; }
+    input:checked + .slider:before { transform: translateX(20px); }
+
+    /* 카드 & 폼 */
+    .card { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 24px; margin-bottom: 20px; box-shadow: 0 2px 6px rgba(0,0,0,0.03); }
+    .status-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 16px 0; }
+    .stat-box { background: var(--bg); padding: 16px; border-radius: 10px; text-align: center; border: 1px solid var(--border); }
+    .stat-box .label { font-size: 0.85rem; color: var(--muted); margin-bottom: 4px; }
+    .stat-box .value { font-size: 1.5rem; font-weight: 700; }
+    .stat-box.highlight .value { color: var(--primary); }
+    .stat-box.wait .value { color: var(--warning); }
+
+    .progress-wrap { width: 100%; height: 10px; background: #e2e8f0; border-radius: 99px; overflow: hidden; margin-bottom: 20px; }
+    .progress-bar { height: 100%; background: var(--primary); transition: width 0.3s; }
+    .progress-bar.full { background: var(--warning); }
+
+    .form-group { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
+    input[type="text"], input[type="date"], select { width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 8px; font-size: 1rem; }
+    input:focus { outline: none; border-color: var(--primary); }
+
+    .btn { width: 100%; padding: 13px; border: none; border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: 0.2s; }
+    .btn-primary { background: var(--primary); color: white; }
+    .btn-primary:hover:not(:disabled) { background: var(--primary-hover); }
+    .btn-warning { background: var(--warning); color: white; }
+    .btn-danger { background: var(--danger); color: white; }
+    .btn-outline { background: white; border: 1px solid var(--border); color: var(--text); }
+    .btn:disabled { background: #cbd5e1; color: #64748b; cursor: not-allowed; }
+    .btn-sm { padding: 6px 10px; font-size: 0.82rem; width: auto; }
+
+    /* 내 예약 조회 영역 */
+    .my-ticket { margin-top: 16px; padding: 16px; border-radius: 10px; background: #eff6ff; border: 1px solid #bfdbfe; display: flex; justify-content: space-between; align-items: center; }
+    .badge { display: inline-block; padding: 3px 8px; border-radius: 6px; font-size: 0.78rem; font-weight: 700; }
+    .badge-confirmed { background: #dcfce7; color: #166534; }
+    .badge-waitlist { background: #fef3c7; color: #92400e; }
+    .badge-canceled { background: #fee2e2; color: #991b1b; }
+
+    /* 테이블 */
+    .table-wrap { overflow-x: auto; margin-top: 16px; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+    th, td { padding: 12px 10px; text-align: left; border-bottom: 1px solid var(--border); }
+    th { background: var(--bg); color: var(--muted); font-weight: 600; }
+    .hidden { display: none !important; }
+    .notice { font-size: 0.85rem; color: var(--muted); margin-top: 10px; }
+
+    @media (max-width: 600px) {
+      .form-group, .status-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <h1>🍱 구내식당 예약 시스템</h1>
+    <div class="tabs">
+      <button class="tab-btn active" id="tabUser" onclick="switchTab('user')">신청자 화면</button>
+      <button class="tab-btn" id="tabAdmin" onclick="switchTab('admin')">관리자 화면</button>
+    </div>
+  </header>
+
+  <!-- 시간 제약 테스트용 토글 -->
+  <div class="test-bar">
+    <div>
+      <strong>⏰ 접수 시간: 매일 10:00 ~ 12:00</strong>
+      <span id="timeStatusText" style="margin-left: 8px;"></span>
+    </div>
+    <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
+      <span>테스트 모드 (시간제한 해제)</span>
+      <label class="switch">
+        <input type="checkbox" id="testModeToggle" checked onchange="renderAll()">
+        <span class="slider"></span>
+      </label>
+    </label>
+  </div>
+
+  <!-- ================= 1. 신청자 화면 ================= -->
+  <section id="userView">
+    <div class="card">
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <h2 style="font-size:1.2rem;">오늘의 식수 현황 (<span id="todayDateLabel"></span>)</h2>
+        <span style="font-size:0.85rem; color:var(--muted);">정원 150명 / 초과 시 자동 대기</span>
+      </div>
+
+      <div class="status-grid">
+        <div class="stat-box highlight">
+          <div class="label">확정 인원</div>
+          <div class="value"><span id="confirmedCount">0</span> / 150</div>
+        </div>
+        <div class="stat-box">
+          <div class="label">남은 자리</div>
+          <div class="value" id="remainingCount">150</div>
+        </div>
+        <div class="stat-box wait">
+          <div class="label">현재 대기</div>
+          <div class="value"><span id="waitlistCount">0</span>명</div>
+        </div>
+      </div>
+
+      <div class="progress-wrap">
+        <div class="progress-bar" id="capacityBar" style="width: 0%;"></div>
+      </div>
+
+      <div class="form-group">
+        <input type="text" id="userDept" placeholder="부서명 (예: 개발팀)" />
+        <input type="text" id="userName" placeholder="이름 (예: 홍길동)" />
+      </div>
+
+      <button class="btn btn-primary" id="reserveBtn" onclick="handleReserve()">식사 예약하기</button>
+      <p class="notice">※ 150명 마감 후 신청 시 '대기'로 등록되며, 확정자 취소 발생 시 대기 1번부터 자동 확정됩니다.</p>
+    </div>
+
+    <!-- 내 예약 확인 및 취소 -->
+    <div class="card">
+      <h3 style="font-size:1.1rem; margin-bottom:12px;">🔍 내 예약 확인 및 취소</h3>
+      <div style="display:flex; gap:8px;">
+        <input type="text" id="searchName" placeholder="신청한 이름을 입력하세요" onkeyup="renderMyReservation()" />
+      </div>
+      <div id="myReservationBox"></div>
+    </div>
+  </section>
+
+  <!-- ================= 2. 관리자 화면 ================= -->
+  <section id="adminView" class="hidden">
+    <div class="card">
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:16px;">
+        <h2 style="font-size:1.2rem;">📋 예약 명단 및 취소/대기 관리</h2>
+        <div style="display:flex; gap:8px;">
+          <input type="date" id="adminDateFilter" onchange="renderAdminTable()" style="padding:6px 10px;" />
+          <button class="btn btn-outline btn-sm" onclick="exportCSV()">📥 엑셀(CSV) 다운로드</button>
+        </div>
+      </div>
+
+      <!-- 관리자 대리 등록 -->
+      <div style="background:var(--bg); padding:14px; border-radius:10px; margin-bottom:16px; display:flex; gap:8px; flex-wrap:wrap;">
+        <input type="text" id="adminAddDept" placeholder="부서명" style="flex:1; min-width:120px; padding:8px;" />
+        <input type="text" id="adminAddName" placeholder="이름 (전화/방문 대리등록)" style="flex:1; min-width:140px; padding:8px;" />
+        <button class="btn btn-primary btn-sm" onclick="adminAddReservation()">+ 대리 등록</button>
+      </div>
+
+      <!-- 필터 버튼 -->
+      <div style="display:flex; gap:6px; margin-bottom:10px;">
+        <button class="btn btn-outline btn-sm" onclick="setFilter('ALL')">전체</button>
+        <button class="btn btn-outline btn-sm" onclick="setFilter('CONFIRMED')">확정만</button>
+        <button class="btn btn-outline btn-sm" onclick="setFilter('WAITLIST')">대기만</button>
+        <button class="btn btn-outline btn-sm" onclick="setFilter('CANCELED')">취소내역</button>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>순번</th>
+              <th>상태</th>
+              <th>부서</th>
+              <th>이름</th>
+              <th>신청시각</th>
+              <th>식사여부</th>
+              <th>관리</th>
+            </tr>
+          </thead>
+          <tbody id="adminTableBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+</div>
+
+<script>
+  const MAX_CAPACITY = 150;
+  const ADMIN_PW = "1234"; // 관리자 비밀번호
+  let isAdminAuthenticated = false;
+  let currentFilter = "ALL";
+
+  // 오늘 날짜 문자열 (YYYY-MM-DD)
+  function getTodayStr() {
+    const now = new Date();
+    const offset = now.getTimezoneOffset() * 60000;
+    return new Date(now - offset).toISOString().split('T')[0];
+  }
+
+  // 데이터 로드 & 저장
+  function getReservations() {
+    return JSON.parse(localStorage.getItem('cafeteria_reservations') || '[]');
+  }
+  function saveReservations(data) {
+    localStorage.setItem('cafeteria_reservations', JSON.stringify(data));
+  }
+
+  // 예약 가능 시간 확인 (10:00 ~ 12:00)
+  function isWithinBookingHours() {
+    if (document.getElementById('testModeToggle').checked) return true;
+    const hour = new Date().getHours();
+    return hour >= 10 && hour < 12;
+  }
+
+  // 핵심 로직: 취소 발생 시 대기 1번 자동 승격 및 순번 재정렬
+  function rebalanceQueue(dateStr) {
+    let all = getReservations();
+    let dayList = all.filter(r => r.date === dateStr);
+    let otherList = all.filter(r => r.date !== dateStr);
+
+    // 취소되지 않은 유효 신청자를 신청 시각순으로 정렬
+    let active = dayList
+      .filter(r => r.status !== 'CANCELED')
+      .sort((a, b) => a.timestamp - b.timestamp);
+
+    let canceled = dayList.filter(r => r.status === 'CANCELED');
+
+    // 상위 150명은 CONFIRMED, 그 이후는 WAITLIST 자동 배정
+    active.forEach((item, index) => {
+      if (index < MAX_CAPACITY) {
+        item.status = 'CONFIRMED';
+        item.waitNumber = null;
+      } else {
+        item.status = 'WAITLIST';
+        item.waitNumber = index - MAX_CAPACITY + 1;
+      }
+    });
+
+    saveReservations([...otherList, ...active, ...canceled]);
+  }
+
+  // 예약 신청
+  function handleReserve(customDept = null, customName = null, targetDate = null) {
+    const isAdminAction = customDept !== null;
+    if (!isAdminAction && !isWithinBookingHours()) {
+      alert("예약 가능 시간(오전 10:00 ~ 12:00)이 아닙니다.");
+      return;
+    }
+
+    const dept = (customDept ?? document.getElementById('userDept').value).trim();
+    const name = (customName ?? document.getElementById('userName').value).trim();
+    const dateStr = targetDate || getTodayStr();
+
+    if (!dept || !name) {
+      alert("부서명과 이름을 모두 입력해주세요.");
+      return;
+    }
+
+    const all = getReservations();
+    const duplicate = all.find(r => r.date === dateStr && r.name === name && r.dept === dept && r.status !== 'CANCELED');
+    if (duplicate) {
+      alert("이미 예약(또는 대기) 내역이 존재합니다.");
+      return;
+    }
+
+    const newEntry = {
+      id: Date.now() + Math.random().toString(36).substr(2, 5),
+      date: dateStr,
+      dept,
+      name,
+      status: 'CONFIRMED',
+      waitNumber: null,
+      timestamp: Date.now(),
+      timeStr: new Date().toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
+      ate: false
+    };
+
+    all.push(newEntry);
+    saveReservations(all);
+    rebalanceQueue(dateStr);
+
+    const updated = getReservations().find(r => r.id === newEntry.id);
+    if (updated.status === 'CONFIRMED') {
+      alert(`✅ [${dept} ${name}] 식사 예약이 확정되었습니다!`);
+    } else {
+      alert(`⏳ 정원(150명)이 마감되어 [대기 ${updated.waitNumber}번]으로 등록되었습니다.\n취소자 발생 시 자동으로 확정됩니다.`);
+    }
+
+    if (!isAdminAction) {
+      document.getElementById('searchName').value = name;
+      document.getElementById('userName').value = '';
+    }
+    renderAll();
+  }
+
+  // 예약 취소 (취소 시 대기 1번 자동 승격)
+  function cancelReservation(id, byAdmin = false) {
+    if (!byAdmin && !isWithinBookingHours()) {
+      alert("본인 취소는 오전 10:00 ~ 12:00 사이에만 가능합니다. 이후에는 관리자에게 문의하세요.");
+      return;
+    }
+    if (!confirm("정말 예약을 취소하시겠습니까?\n취소 시 다음 대기자에게 자리가 자동 배정됩니다.")) return;
+
+    const all = getReservations();
+    const target = all.find(r => r.id === id);
+    if (!target) return;
+
+    target.status = 'CANCELED';
+    target.waitNumber = null;
+    saveReservations(all);
+
+    // 대기열 자동 승격 실행
+    rebalanceQueue(target.date);
+    renderAll();
+  }
+
+  // 관리자 복구 기능
+  function restoreReservation(id) {
+    const all = getReservations();
+    const target = all.find(r => r.id === id);
+    if (!target) return;
+
+    target.status = 'CONFIRMED';
+    target.timestamp = Date.now(); // 복구 시 맨 뒤 순번 부여
+    saveReservations(all);
+    rebalanceQueue(target.date);
+    renderAll();
+  }
+
+  // 식사 체크 토글
+  function toggleAte(id) {
+    const all = getReservations();
+    const target = all.find(r => r.id === id);
+    if (target) {
+      target.ate = !target.ate;
+      saveReservations(all);
+      renderAdminTable();
+    }
+  }
+
+  // 화면 전환
+  function switchTab(tab) {
+    if (tab === 'admin') {
+      if (!isAdminAuthenticated) {
+        const pw = prompt("관리자 비밀번호를 입력하세요 (초기 비밀번호: 1234)");
+        if (pw !== ADMIN_PW) {
+          alert("비밀번호가 일치하지 않습니다.");
+          return;
+        }
+        isAdminAuthenticated = true;
+      }
+      document.getElementById('userView').classList.add('hidden');
+      document.getElementById('adminView').classList.remove('hidden');
+      document.getElementById('tabAdmin').classList.add('active');
+      document.getElementById('tabUser').classList.remove('active');
+    } else {
+      document.getElementById('adminView').classList.add('hidden');
+      document.getElementById('userView').classList.remove('hidden');
+      document.getElementById('tabUser').classList.add('active');
+      document.getElementById('tabAdmin').classList.remove('active');
+    }
+    renderAll();
+  }
+
+  function adminAddReservation() {
+    const dept = document.getElementById('adminAddDept').value;
+    const name = document.getElementById('adminAddName').value;
+    const dateStr = document.getElementById('adminDateFilter').value;
+    handleReserve(dept, name, dateStr);
+    document.getElementById('adminAddDept').value = '';
+    document.getElementById('adminAddName').value = '';
+  }
+
+  function setFilter(filter) {
+    currentFilter = filter;
+    renderAdminTable();
+  }
+
+  // UI 렌더링
+  function renderAll() {
+    const today = getTodayStr();
+    document.getElementById('todayDateLabel').textContent = today;
+    if (!document.getElementById('adminDateFilter').value) {
+      document.getElementById('adminDateFilter').value = today;
+    }
+
+    const canBook = isWithinBookingHours();
+    const timeStatus = document.getElementById('timeStatusText');
+    const reserveBtn = document.getElementById('reserveBtn');
+
+    const all = getReservations().filter(r => r.date === today);
+    const confirmed = all.filter(r => r.status === 'CONFIRMED');
+    const waitlist = all.filter(r => r.status === 'WAITLIST');
+
+    document.getElementById('confirmedCount').textContent = confirmed.length;
+    document.getElementById('remainingCount').textContent = Math.max(0, MAX_CAPACITY - confirmed.length);
+    document.getElementById('waitlistCount').textContent = waitlist.length;
+
+    const percent = Math.min(100, (confirmed.length / MAX_CAPACITY) * 100);
+    const bar = document.getElementById('capacityBar');
+    bar.style.width = percent + '%';
+    bar.classList.toggle('full', confirmed.length >= MAX_CAPACITY);
+
+    if (canBook) {
+      timeStatus.innerHTML = `<span style="color:var(--success); font-weight:700;">● 접수 중</span>`;
+      reserveBtn.disabled = false;
+      if (confirmed.length >= MAX_CAPACITY) {
+        reserveBtn.textContent = `정원 마감 - 대기 신청하기 (현재 대기 ${waitlist.length}명)`;
+        reserveBtn.className = "btn btn-warning";
+      } else {
+        reserveBtn.textContent = "식사 예약하기";
+        reserveBtn.className = "btn btn-primary";
+      }
+    } else {
+      timeStatus.innerHTML = `<span style="color:var(--danger); font-weight:700;">● 접수 마감 (10~12시만 가능)</span>`;
+      reserveBtn.disabled = true;
+      reserveBtn.textContent = "예약 가능 시간이 아닙니다 (10:00 ~ 12:00)";
+      reserveBtn.className = "btn";
+    }
+
+    renderMyReservation();
+    renderAdminTable();
+  }
+
+  function renderMyReservation() {
+    const keyword = document.getElementById('searchName').value.trim();
+    const box = document.getElementById('myReservationBox');
+    if (!keyword) { box.innerHTML = ''; return; }
+
+    const today = getTodayStr();
+    const matches = getReservations().filter(r => r.date === today && r.name.includes(keyword) && r.status !== 'CANCELED');
+
+    if (matches.length === 0) {
+      box.innerHTML = `<p class="notice">오늘 날짜로 조회된 유효한 예약이 없습니다.</p>`;
+      return;
+    }
+
+    box.innerHTML = matches.map(r => `
+      <div class="my-ticket">
+        <div>
+          <strong>${r.dept} ${r.name}</strong>
+          <div style="margin-top:4px;">
+            ${r.status === 'CONFIRMED'
+              ? `<span class="badge badge-confirmed">예약 확정</span>`
+              : `<span class="badge badge-waitlist">대기 ${r.waitNumber}번</span>`}
+            <span style="font-size:0.8rem; color:var(--muted); margin-left:6px;">신청: ${r.timeStr}</span>
+          </div>
+        </div>
+        <button class="btn btn-danger btn-sm" onclick="cancelReservation('${r.id}', false)">예약 취소</button>
+      </div>
+    `).join('');
+  }
+
+  function renderAdminTable() {
+    const dateStr = document.getElementById('adminDateFilter').value || getTodayStr();
+    let list = getReservations()
+      .filter(r => r.date === dateStr)
+      .sort((a, b) => a.timestamp - b.timestamp);
+
+    if (currentFilter !== 'ALL') {
+      list = list.filter(r => r.status === currentFilter);
+    }
+
+    const tbody = document.getElementById('adminTableBody');
+    if (list.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; color:var(--muted); padding:24px;">데이터가 없습니다.</td></tr>`;
+      return;
+    }
+
+    tbody.innerHTML = list.map((r, idx) => {
+      let badge = '';
+      if (r.status === 'CONFIRMED') badge = `<span class="badge badge-confirmed">확정</span>`;
+      else if (r.status === 'WAITLIST') badge = `<span class="badge badge-waitlist">대기 ${r.waitNumber}번</span>`;
+      else badge = `<span class="badge badge-canceled">취소됨</span>`;
+
+      return `
+        <tr>
+          <td>${idx + 1}</td>
+          <td>${badge}</td>
+          <td>${r.dept}</td>
+          <td><strong>${r.name}</strong></td>
+          <td>${r.timeStr}</td>
+          <td>
+            ${r.status === 'CONFIRMED'
+              ? `<input type="checkbox" ${r.ate ? 'checked' : ''} onchange="toggleAte('${r.id}')" />`
+              : '-'}
+          </td>
+          <td>
+            ${r.status !== 'CANCELED'
+              ? `<button class="btn btn-danger btn-sm" onclick="cancelReservation('${r.id}', true)">취소</button>`
+              : `<button class="btn btn-outline btn-sm" onclick="restoreReservation('${r.id}')">복구</button>`}
+          </td>
+        </tr>
+      `;
+    }).join('');
+  }
+
+  // 엑셀(CSV) 다운로드
+  function exportCSV() {
+    const dateStr = document.getElementById('adminDateFilter').value || getTodayStr();
+    const list = getReservations().filter(r => r.date === dateStr);
+    if (list.length === 0) { alert("다운로드할 데이터가 없습니다."); return; }
+
+    let csv = "\uFEFF날짜,상태,대기순번,부서,이름,신청시각,식사여부\n";
+    list.forEach(r => {
+      const statusKo = r.status === 'CONFIRMED' ? '확정' : (r.status === 'WAITLIST' ? '대기' : '취소');
+      csv += `${r.date},${statusKo},${r.waitNumber || ''},${r.dept},${r.name},${r.timeStr},${r.ate ? 'O' : 'X'}\n`;
+    });
+
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = `구내식당_예약명단_${dateStr}.csv`;
+    link.click();
+  }
+
+  // 초기 실행 및 10초마다 시간 체크 갱신
+  renderAll();
+  setInterval(renderAll, 10000);
+</script>
+</body>
+</html>
