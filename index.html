@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>최상단 INDEX · 웹앱 허브 (라이트 테마)</title>
+  <title>최상단 INDEX · 웹앱 게시판 &amp; QR 스튜디오</title>
   <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
   <style>
@@ -38,11 +38,11 @@
       background: var(--bg);
       color: var(--text);
       line-height: 1.6;
-      padding: 24px 16px 60px;
+      padding: 24px 16px 64px;
     }
 
     .app {
-      max-width: 920px;
+      max-width: 960px;
       margin: 0 auto;
       display: grid;
       gap: 20px;
@@ -56,21 +56,20 @@
       box-shadow: var(--shadow);
     }
 
-    /* [00] 최상단 INDEX 헤더 */
-    .index-header {
+    /* [00] 최상단 INDEX */
+    .index-top {
       display: flex;
       flex-wrap: wrap;
       justify-content: space-between;
       align-items: flex-start;
-      gap: 14px;
-      margin-bottom: 16px;
+      gap: 12px;
+      margin-bottom: 14px;
     }
 
     .index-title {
       font-size: 1.5rem;
       font-weight: 800;
       letter-spacing: -0.02em;
-      color: var(--text);
     }
 
     .index-sub {
@@ -82,24 +81,23 @@
     .badge {
       display: inline-flex;
       align-items: center;
-      gap: 6px;
       font-size: 0.78rem;
       font-weight: 700;
       color: var(--accent-hover);
       background: var(--accent-soft);
       border: 1px solid #bae6fd;
-      padding: 6px 11px;
+      padding: 6px 12px;
       border-radius: 999px;
     }
 
-    .quick-nav {
+    .index-nav {
       display: flex;
       flex-wrap: wrap;
       gap: 8px;
-      margin-bottom: 18px;
+      margin-bottom: 16px;
     }
 
-    .quick-nav a {
+    .index-nav a {
       text-decoration: none;
       color: var(--text);
       background: var(--surface-2);
@@ -108,102 +106,198 @@
       border-radius: 8px;
       font-size: 0.84rem;
       font-weight: 600;
-      transition: border-color 0.18s ease, color 0.18s ease, background 0.18s ease;
+      transition: all 0.15s ease;
     }
 
-    .quick-nav a:hover {
+    .index-nav a:hover {
       border-color: var(--accent);
       color: var(--accent);
       background: var(--accent-soft);
     }
 
-    .search-row {
-      margin-bottom: 16px;
+    .filter-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
     }
 
-    input[type="search"],
-    input[type="url"],
-    input[type="text"],
-    textarea {
-      width: 100%;
-      padding: 11px 14px;
+    .filter-bar input[type="search"] {
+      flex: 1 1 260px;
+      padding: 10px 14px;
       border-radius: 10px;
       border: 1px solid var(--border);
       background: var(--surface-2);
       color: var(--text);
-      font-size: 0.94rem;
+      font-size: 0.92rem;
       outline: none;
-      font-family: inherit;
-      transition: border-color 0.15s ease, box-shadow 0.15s ease;
     }
 
-    input:focus,
-    textarea:focus {
+    .filter-bar input[type="search"]:focus {
       border-color: var(--accent);
       background: var(--surface);
-      box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.12);
     }
 
-    /* INDEX 모듈 카드 그리드 */
-    .index-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-      gap: 12px;
-    }
-
-    .index-item {
-      background: var(--surface-2);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 14px;
+    .cat-pills {
       display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      gap: 10px;
-      transition: transform 0.15s ease, border-color 0.18s ease, box-shadow 0.18s ease;
+      flex-wrap: wrap;
+      gap: 6px;
     }
 
-    .index-item:hover {
-      transform: translateY(-2px);
+    .pill-btn {
+      background: var(--surface-2);
+      color: var(--muted);
+      border: 1px solid var(--border);
+      padding: 7px 12px;
+      border-radius: 8px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .pill-btn.active {
+      background: var(--accent);
+      color: #ffffff;
       border-color: var(--accent);
-      background: var(--surface);
-      box-shadow: 0 6px 18px rgba(2, 132, 199, 0.08);
     }
 
-    .index-item-code {
-      font-size: 0.76rem;
+    /* 섹션 헤더 */
+    .section-head {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 14px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .section-code {
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 0.8rem;
       font-weight: 700;
       color: var(--accent);
-      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
     }
 
-    .index-item-title {
-      font-size: 1rem;
-      font-weight: 700;
-      margin-top: 2px;
-      color: var(--text);
+    h2 {
+      font-size: 1.18rem;
     }
 
-    .index-item-desc {
-      font-size: 0.85rem;
+    .desc {
       color: var(--muted);
-      margin-top: 4px;
+      font-size: 0.9rem;
+      margin-bottom: 14px;
     }
 
-    .index-item-actions {
-      display: flex;
-      gap: 8px;
-      margin-top: 4px;
+    /* [01] 게시판 형태 리스트업 */
+    .board-wrap {
+      overflow-x: auto;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: var(--surface);
+    }
+
+    table.board-table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 680px;
+      font-size: 0.9rem;
+    }
+
+    .board-table thead th {
+      background: var(--surface-2);
+      color: var(--muted);
+      font-size: 0.78rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      padding: 11px 14px;
+      border-bottom: 1px solid var(--border);
+      text-align: left;
+    }
+
+    .board-table tbody td {
+      padding: 13px 14px;
+      border-bottom: 1px solid var(--border);
+      vertical-align: middle;
+    }
+
+    .board-table tbody tr:last-child td {
+      border-bottom: none;
+    }
+
+    .board-table tbody tr:hover {
+      background: #f8fbff;
+    }
+
+    .col-no {
+      width: 64px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-weight: 700;
+      color: var(--muted);
+    }
+
+    .col-tag {
+      width: 110px;
+    }
+
+    .tag {
+      display: inline-block;
+      font-size: 0.76rem;
+      font-weight: 700;
+      padding: 3px 9px;
+      border-radius: 999px;
+      background: var(--accent-soft);
+      color: var(--accent-hover);
+      border: 1px solid #bae6fd;
+    }
+
+    .tag.game {
+      background: #fef3c7;
+      color: #b45309;
+      border-color: #fde68a;
+    }
+
+    .board-title-link {
+      font-weight: 700;
+      color: var(--text);
+      text-decoration: none;
+      display: block;
+    }
+
+    .board-title-link:hover {
+      color: var(--accent);
+      text-decoration: underline;
+    }
+
+    .board-summary {
+      font-size: 0.82rem;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    .col-date {
+      width: 120px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+
+    .col-action {
+      width: 150px;
+      text-align: right;
+      white-space: nowrap;
     }
 
     .btn {
       background: var(--accent);
       color: #ffffff;
       border: none;
-      padding: 9px 14px;
+      padding: 8px 13px;
       border-radius: 8px;
+      font-size: 0.82rem;
       font-weight: 700;
-      font-size: 0.86rem;
       cursor: pointer;
       text-decoration: none;
       display: inline-flex;
@@ -222,8 +316,8 @@
     }
 
     .btn-sm {
-      padding: 6px 11px;
-      font-size: 0.8rem;
+      padding: 6px 10px;
+      font-size: 0.78rem;
     }
 
     .btn-secondary {
@@ -238,42 +332,63 @@
       background: var(--surface-2);
     }
 
-    /* 섹션 공통 */
-    .section-head {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: space-between;
-      align-items: center;
+    /* [02] QR 웹앱 섹션 */
+    .qr-tabs {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
       gap: 8px;
-      margin-bottom: 14px;
-      padding-bottom: 10px;
-      border-bottom: 1px solid var(--border);
+      background: var(--surface-2);
+      padding: 5px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      margin-bottom: 16px;
     }
 
-    .section-code {
-      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-      font-size: 0.82rem;
-      color: var(--accent);
-      font-weight: 700;
-    }
-
-    h2 {
-      font-size: 1.18rem;
-      color: var(--text);
-    }
-
-    .desc {
+    .qr-tab-btn {
+      background: transparent;
       color: var(--muted);
+      border: none;
+      padding: 9px 12px;
+      border-radius: 8px;
+      font-weight: 700;
       font-size: 0.9rem;
-      margin-bottom: 14px;
+      cursor: pointer;
+    }
+
+    .qr-tab-btn.active {
+      background: var(--accent);
+      color: #ffffff;
+    }
+
+    .qr-panel {
+      display: none;
+    }
+
+    .qr-panel.active {
+      display: block;
     }
 
     label {
       display: block;
-      font-size: 0.88rem;
+      font-size: 0.86rem;
       font-weight: 600;
       margin-bottom: 6px;
+    }
+
+    input[type="url"] {
+      width: 100%;
+      padding: 11px 14px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: var(--surface-2);
       color: var(--text);
+      font-size: 0.94rem;
+      outline: none;
+    }
+
+    input[type="url"]:focus {
+      border-color: var(--accent);
+      background: var(--surface);
     }
 
     .controls-row {
@@ -290,12 +405,12 @@
       border: 1px solid var(--border);
       border-radius: 12px;
       padding: 20px;
-      min-height: 230px;
+      min-height: 220px;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      gap: 12px;
+      gap: 10px;
     }
 
     #qrCodeContainer {
@@ -304,24 +419,21 @@
       border-radius: 10px;
       border: 1px solid var(--border);
       display: inline-flex;
-      align-items: center;
-      justify-content: center;
     }
 
     .placeholder-text {
       color: var(--muted);
-      font-size: 0.9rem;
+      font-size: 0.88rem;
       text-align: center;
     }
 
     .dropzone {
       border: 2px dashed #cbd5e1;
       border-radius: 12px;
-      padding: 24px 16px;
+      padding: 22px 16px;
       text-align: center;
       background: var(--surface-2);
       cursor: pointer;
-      transition: border-color 0.18s ease, background 0.18s ease;
     }
 
     .dropzone:hover,
@@ -359,7 +471,7 @@
 
     #uploadedPreview {
       max-width: 100%;
-      max-height: 220px;
+      max-height: 210px;
       border-radius: 8px;
       object-fit: contain;
     }
@@ -373,68 +485,30 @@
     }
 
     .result-status {
-      font-size: 0.85rem;
+      font-size: 0.84rem;
       font-weight: 700;
       margin-bottom: 6px;
       color: var(--muted);
     }
 
-    .result-status.ok {
-      color: var(--success);
-    }
-
-    .result-status.err {
-      color: var(--error);
-    }
+    .result-status.ok { color: var(--success); }
+    .result-status.err { color: var(--error); }
 
     .decoded-link {
       word-break: break-all;
       font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
       font-size: 0.9rem;
       color: var(--accent-hover);
+      font-weight: 600;
       text-decoration: none;
-      font-weight: 600;
-    }
-
-    .decoded-link:hover {
-      text-decoration: underline;
-    }
-
-    /* [05] 텍스트 카운터 통계 그리드 */
-    .stats-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-      gap: 10px;
-      margin-top: 14px;
-    }
-
-    .stat-box {
-      background: var(--surface-2);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 12px;
-    }
-
-    .stat-label {
-      font-size: 0.78rem;
-      color: var(--muted);
-      font-weight: 600;
-    }
-
-    .stat-value {
-      font-size: 1.25rem;
-      font-weight: 800;
-      color: var(--text);
-      margin-top: 2px;
-      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
     }
 
     .guide-list {
       padding-left: 18px;
       color: var(--muted);
-      font-size: 0.9rem;
+      font-size: 0.88rem;
       display: grid;
-      gap: 8px;
+      gap: 6px;
     }
 
     .guide-list code {
@@ -444,223 +518,185 @@
       padding: 2px 6px;
       border-radius: 5px;
     }
-
-    .save-note {
-      font-size: 0.82rem;
-      color: var(--muted);
-    }
   </style>
 </head>
 <body>
   <main class="app">
-    <!-- [00] 최상단 INDEX 허브 -->
+    <!-- [00] 최상단 INDEX -->
     <header id="top-index" class="card">
-      <div class="index-header">
+      <div class="index-top">
         <div>
-          <h1 class="index-title">INDEX · 개인 웹앱 허브</h1>
-          <p class="index-sub">GitHub Pages 단일 파일 배포용 최상단 인덱스 — 원하는 기능으로 바로 이동하거나 검색하세요.</p>
+          <h1 class="index-title">INDEX · 웹앱 게시판 허브</h1>
+          <p class="index-sub">최상단 인덱스에서 QR 웹앱과 저장소 콘텐츠를 게시판 형태로 조회하고 바로 실행합니다.</p>
         </div>
-        <span class="badge">Light Mode · index.html</span>
+        <span class="badge">Board Index · index.html</span>
       </div>
 
-      <nav class="quick-nav" aria-label="최상단 인덱스 바로가기">
+      <nav class="index-nav" aria-label="최상단 인덱스 바로가기">
         <a href="#top-index">[00] 최상단 INDEX</a>
-        <a href="#module-qr-gen">[01] QR 생성</a>
-        <a href="#module-qr-read">[02] QR 읽기</a>
-        <a href="#module-notes">[03] 퀵 메모</a>
-        <a href="#module-text-counter">[05] 글자 수 카운터</a>
-        <a href="#deploy-guide">[04] GitHub 배포</a>
+        <a href="#board-list">[01] 게시판 리스트</a>
+        <a href="#qr-studio">[02] QR 웹앱</a>
+        <a href="#deploy-notes">[03] 배포 메모</a>
       </nav>
 
-      <div class="search-row">
-        <label for="indexSearch">INDEX 모듈 검색</label>
-        <input
-          id="indexSearch"
-          type="search"
-          placeholder="예: QR, 생성, 읽기, 메모, 글자 수, 배포..."
-          autocomplete="off"
-        />
-      </div>
-
-      <div id="indexGrid" class="index-grid">
-        <article class="index-item" data-keywords="01 qr 생성 링크 url png 다운로드">
-          <div>
-            <div class="index-item-code">INDEX-01</div>
-            <div class="index-item-title">QR 코드 자동 생성</div>
-            <p class="index-item-desc">링크를 입력하면 QR 코드를 즉시 만들고 PNG로 저장합니다.</p>
-          </div>
-          <div class="index-item-actions">
-            <a class="btn btn-sm" href="#module-qr-gen">열기</a>
-          </div>
-        </article>
-
-        <article class="index-item" data-keywords="02 qr 읽기 이미지 업로드 링크 추출 복사">
-          <div>
-            <div class="index-item-code">INDEX-02</div>
-            <div class="index-item-title">QR 이미지 판독</div>
-            <p class="index-item-desc">이미지를 업로드해 QR 코드 속 링크를 읽고 복사합니다.</p>
-          </div>
-          <div class="index-item-actions">
-            <a class="btn btn-sm" href="#module-qr-read">열기</a>
-          </div>
-        </article>
-
-        <article class="index-item" data-keywords="03 메모 노트 기록 저장">
-          <div>
-            <div class="index-item-code">INDEX-03</div>
-            <div class="index-item-title">퀵 메모장</div>
-            <p class="index-item-desc">아이디어와 작업 메모를 브라우저 저장소에 보관합니다.</p>
-          </div>
-          <div class="index-item-actions">
-            <a class="btn btn-sm" href="#module-notes">열기</a>
-          </div>
-        </article>
-
-        <article class="index-item" data-keywords="05 글자 수 텍스트 카운터 단어 줄 복사">
-          <div>
-            <div class="index-item-code">INDEX-05</div>
-            <div class="index-item-title">글자 수 카운터</div>
-            <p class="index-item-desc">공백 포함·제외 글자 수, 단어 수, 줄 수를 실시간 계산합니다.</p>
-          </div>
-          <div class="index-item-actions">
-            <a class="btn btn-sm" href="#module-text-counter">열기</a>
-          </div>
-        </article>
-
-        <article class="index-item" data-keywords="04 깃허브 github pages 배포 업로드">
-          <div>
-            <div class="index-item-code">INDEX-04</div>
-            <div class="index-item-title">GitHub Pages 배포</div>
-            <p class="index-item-desc">저장소에 index.html을 올리고 웹 주소로 공개하는 절차입니다.</p>
-          </div>
-          <div class="index-item-actions">
-            <a class="btn btn-sm btn-secondary" href="#deploy-guide">가이드 보기</a>
-          </div>
-        </article>
+      <div class="filter-bar">
+        <input id="boardSearch" type="search" placeholder="게시판 제목, 태그, 설명 검색 (예: QR, 생성, 읽기, 게임...)" autocomplete="off" />
+        <div class="cat-pills" role="group" aria-label="게시판 분류 필터">
+          <button class="pill-btn active" data-cat="all" type="button">전체</button>
+          <button class="pill-btn" data-cat="qr" type="button">QR 웹앱</button>
+          <button class="pill-btn" data-cat="game" type="button">게임</button>
+          <button class="pill-btn" data-cat="repo" type="button">저장소</button>
+        </div>
       </div>
     </header>
 
-    <!-- [01] QR 생성 -->
-    <section id="module-qr-gen" class="card">
+    <!-- [01] 게시판 형태 리스트업 -->
+    <section id="board-list" class="card">
       <div class="section-head">
-        <h2>QR 코드 자동 생성</h2>
-        <span class="section-code">INDEX-01 · #module-qr-gen</span>
+        <h2>웹앱 게시판 리스트</h2>
+        <span class="section-code">INDEX-01 · BOARD</span>
       </div>
-      <p class="desc">링크(URL) 또는 텍스트를 입력하면 QR 코드가 자동으로 생성됩니다.</p>
+      <p class="desc">등록된 웹앱과 저장소 항목입니다. <strong>바로 열기</strong>로 섹션으로 이동하거나 <strong>폴더 열기</strong>로 저장소 경로를 확인할 수 있습니다.</p>
 
-      <label for="linkInput">링크(URL) 입력</label>
-      <input id="linkInput" type="url" placeholder="예: https://github.com" autocomplete="off" />
+      <div class="board-wrap">
+        <table class="board-table" aria-label="웹앱 게시판 목록">
+          <thead>
+            <tr>
+              <th class="col-no">No.</th>
+              <th class="col-tag">분류</th>
+              <th>제목 및 요약</th>
+              <th class="col-date">업데이트</th>
+              <th class="col-action">실행</th>
+            </tr>
+          </thead>
+          <tbody id="boardTbody">
+            <tr data-cat="qr" data-keywords="qr 생성 링크 url 다운로드">
+              <td class="col-no">04</td>
+              <td class="col-tag"><span class="tag">QR 웹앱</span></td>
+              <td>
+                <a class="board-title-link" href="#qr-studio" onclick="openQrTab('generate')">QR 코드 자동 생성기</a>
+                <p class="board-summary">링크(URL)를 입력하면 QR 코드를 즉시 만들고 PNG 이미지로 저장합니다.</p>
+              </td>
+              <td class="col-date">2026-11-27</td>
+              <td class="col-action">
+                <a class="btn btn-sm" href="#qr-studio" onclick="openQrTab('generate')">생성 탭 열기</a>
+                <a class="btn btn-sm btn-secondary" href="./QR/">./QR/</a>
+              </td>
+            </tr>
 
-      <div class="controls-row">
-        <button id="downloadQrBtn" class="btn" type="button" disabled>PNG 다운로드</button>
-        <button id="clearQrBtn" class="btn btn-secondary" type="button">초기화</button>
-        <a class="btn btn-secondary" href="#top-index">최상단 INDEX로</a>
-      </div>
+            <tr data-cat="qr" data-keywords="qr 읽기 이미지 업로드 링크 추출 복사">
+              <td class="col-no">03</td>
+              <td class="col-tag"><span class="tag">QR 웹앱</span></td>
+              <td>
+                <a class="board-title-link" href="#qr-studio" onclick="openQrTab('read')">QR 이미지 링크 판독기</a>
+                <p class="board-summary">이미지를 업로드하거나 드래그해 QR 코드 속 링크를 추출·복사·열기합니다.</p>
+              </td>
+              <td class="col-date">2026-11-27</td>
+              <td class="col-action">
+                <a class="btn btn-sm" href="#qr-studio" onclick="openQrTab('read')">읽기 탭 열기</a>
+                <a class="btn btn-sm btn-secondary" href="./QR/">./QR/</a>
+              </td>
+            </tr>
 
-      <div class="qr-preview-box">
-        <div id="qrCodeContainer" style="display: none;"></div>
-        <p id="qrPlaceholder" class="placeholder-text">링크를 입력하면 여기에 QR 코드가 표시됩니다.</p>
+            <tr data-cat="game" data-keywords="게임 코인 대시 장애물 회피 wasd 방향키">
+              <td class="col-no">02</td>
+              <td class="col-tag"><span class="tag game">게임</span></td>
+              <td>
+                <a class="board-title-link" href="./GAME/">코인 대시 &amp; 장애물 회피 게임</a>
+                <p class="board-summary">방향키/WASD 이동, Shift/Space 대시 스킬과 코인 수집 아케이드 게임입니다.</p>
+              </td>
+              <td class="col-date">2026-11-27</td>
+              <td class="col-action">
+                <a class="btn btn-sm btn-secondary" href="./GAME/">./GAME/</a>
+              </td>
+            </tr>
+
+            <tr data-cat="repo" data-keywords="저장소 readme github pages 배포">
+              <td class="col-no">01</td>
+              <td class="col-tag"><span class="tag">저장소</span></td>
+              <td>
+                <a class="board-title-link" href="./README.md">LEEDOSUB 저장소 README</a>
+                <p class="board-summary">GitHub 프로필 및 저장소 개요 문서입니다.</p>
+              </td>
+              <td class="col-date">2026-11-27</td>
+              <td class="col-action">
+                <a class="btn btn-sm btn-secondary" href="./README.md">README</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
       </div>
     </section>
 
-    <!-- [02] QR 읽기 -->
-    <section id="module-qr-read" class="card">
+    <!-- [02] QR 웹앱 섹션 -->
+    <section id="qr-studio" class="card">
       <div class="section-head">
-        <h2>이미지 업로드로 QR 링크 확인</h2>
-        <span class="section-code">INDEX-02 · #module-qr-read</span>
+        <h2>QR 웹앱 (생성 · 이미지 판독)</h2>
+        <span class="section-code">INDEX-02 · QR WEBAPP</span>
       </div>
-      <p class="desc">QR 코드 이미지를 선택하거나 끌어다 놓으면 포함된 링크를 보여줍니다.</p>
+      <p class="desc">게시판에서 선택한 탭에 맞춰 링크로 QR을 생성하거나 이미지에서 링크를 읽을 수 있습니다.</p>
 
-      <div id="dropzone" class="dropzone" tabindex="0" role="button" aria-label="QR 이미지 업로드">
-        <p><strong>이미지를 클릭해 선택</strong>하거나 여기에 드래그하세요 (PNG, JPG, WEBP)</p>
+      <div class="qr-tabs" role="tablist" aria-label="QR 웹앱 탭">
+        <button id="qrTabGenBtn" class="qr-tab-btn active" role="tab" aria-selected="true" type="button">
+          QR 생성하기
+        </button>
+        <button id="qrTabReadBtn" class="qr-tab-btn" role="tab" aria-selected="false" type="button">
+          이미지로 QR 읽기
+        </button>
       </div>
-      <input id="fileInput" type="file" accept="image/*" />
 
-      <div id="uploadedPreviewWrap" class="uploaded-preview-wrap">
-        <img id="uploadedPreview" alt="업로드된 QR 이미지" />
-      </div>
+      <!-- QR 생성 패널 -->
+      <div id="qrPanelGen" class="qr-panel active">
+        <label for="linkInput">링크(URL) 입력</label>
+        <input id="linkInput" type="url" placeholder="예: https://github.com/LEEDOSUB/LEEDOSUB" autocomplete="off" />
 
-      <div class="result-box">
-        <div id="readStatus" class="result-status">대기 중 · 이미지를 업로드해 주세요.</div>
-        <div id="decodedOutput">
-          <span class="placeholder-text">추출된 링크가 여기에 표시됩니다.</span>
-        </div>
         <div class="controls-row">
-          <button id="copyDecodedBtn" class="btn btn-secondary" type="button" disabled>링크 복사</button>
-          <a id="openDecodedLink" class="btn" href="#" target="_blank" rel="noopener noreferrer" style="display: none;">링크 열기</a>
+          <button id="downloadQrBtn" class="btn" type="button" disabled>PNG 다운로드</button>
+          <button id="clearQrBtn" class="btn btn-secondary" type="button">초기화</button>
           <a class="btn btn-secondary" href="#top-index">최상단 INDEX로</a>
         </div>
+
+        <div class="qr-preview-box">
+          <div id="qrCodeContainer" style="display: none;"></div>
+          <p id="qrPlaceholder" class="placeholder-text">링크를 입력하면 여기에 QR 코드가 자동으로 생성됩니다.</p>
+        </div>
+      </div>
+
+      <!-- QR 읽기 패널 -->
+      <div id="qrPanelRead" class="qr-panel">
+        <div id="dropzone" class="dropzone" tabindex="0" role="button" aria-label="QR 이미지 업로드">
+          <p><strong>이미지를 클릭해 선택</strong>하거나 여기에 드래그하세요 (PNG, JPG, WEBP)</p>
+        </div>
+        <input id="fileInput" type="file" accept="image/*" />
+
+        <div id="uploadedPreviewWrap" class="uploaded-preview-wrap">
+          <img id="uploadedPreview" alt="업로드된 QR 이미지" />
+        </div>
+
+        <div class="result-box">
+          <div id="readStatus" class="result-status">대기 중 · QR 이미지를 업로드해 주세요.</div>
+          <div id="decodedOutput">
+            <span class="placeholder-text">추출된 링크가 여기에 표시됩니다.</span>
+          </div>
+          <div class="controls-row">
+            <button id="copyDecodedBtn" class="btn btn-secondary" type="button" disabled>링크 복사</button>
+            <a id="openDecodedLink" class="btn" href="#" target="_blank" rel="noopener noreferrer" style="display: none;">링크 열기</a>
+            <a class="btn btn-secondary" href="#top-index">최상단 INDEX로</a>
+          </div>
+        </div>
       </div>
     </section>
 
-    <!-- [03] 퀵 메모 -->
-    <section id="module-notes" class="card">
+    <!-- [03] 배포 메모 -->
+    <footer id="deploy-notes" class="card">
       <div class="section-head">
-        <h2>퀵 메모장</h2>
-        <span class="section-code">INDEX-03 · #module-notes</span>
-      </div>
-      <p class="desc">다음에 추가할 기능 아이디어나 메모를 적어두세요. (브라우저 localStorage에 자동 저장)</p>
-
-      <label for="quickNoteArea">작업 메모</label>
-      <textarea id="quickNoteArea" rows="4" placeholder="예: 다음 기능으로 색상 커스텀 QR 옵션 추가하기"></textarea>
-
-      <div class="controls-row">
-        <button id="saveNoteBtn" class="btn" type="button">메모 저장</button>
-        <button id="clearNoteBtn" class="btn btn-secondary" type="button">메모 비우기</button>
-        <a class="btn btn-secondary" href="#top-index">최상단 INDEX로</a>
-        <span id="noteSaveStatus" class="save-note"></span>
-      </div>
-    </section>
-
-    <!-- [05] 텍스트·글자 수 카운터 -->
-    <section id="module-text-counter" class="card">
-      <div class="section-head">
-        <h2>텍스트 · 글자 수 카운터</h2>
-        <span class="section-code">INDEX-05 · #module-text-counter</span>
-      </div>
-      <p class="desc">문장이나 메모를 입력하면 글자 수, 공백 제외 글자 수, 단어 수, 줄 수를 즉시 계산합니다.</p>
-
-      <label for="counterInput">분석할 텍스트 입력</label>
-      <textarea id="counterInput" rows="4" placeholder="여기에 텍스트를 입력하거나 붙여넣으세요..."></textarea>
-
-      <div class="stats-grid" aria-live="polite">
-        <div class="stat-box">
-          <div class="stat-label">글자 수 (공백 포함)</div>
-          <div id="statCharsWithSpace" class="stat-value">0</div>
-        </div>
-        <div class="stat-box">
-          <div class="stat-label">글자 수 (공백 제외)</div>
-          <div id="statCharsNoSpace" class="stat-value">0</div>
-        </div>
-        <div class="stat-box">
-          <div class="stat-label">단어 수</div>
-          <div id="statWords" class="stat-value">0</div>
-        </div>
-        <div class="stat-box">
-          <div class="stat-label">줄 수</div>
-          <div id="statLines" class="stat-value">0</div>
-        </div>
-      </div>
-
-      <div class="controls-row">
-        <button id="copyCounterTextBtn" class="btn btn-secondary" type="button">텍스트 복사</button>
-        <button id="clearCounterBtn" class="btn btn-secondary" type="button">지우기</button>
-        <a class="btn btn-secondary" href="#top-index">최상단 INDEX로</a>
-        <span id="counterStatus" class="save-note"></span>
-      </div>
-    </section>
-
-    <!-- [04] GitHub Pages 배포 안내 -->
-    <footer id="deploy-guide" class="card">
-      <div class="section-head">
-        <h2>GitHub Pages 배포 절차</h2>
-        <span class="section-code">INDEX-04 · #deploy-guide</span>
+        <h2>GitHub 배포 및 확장 안내</h2>
+        <span class="section-code">INDEX-03 · DEPLOY</span>
       </div>
       <ol class="guide-list">
-        <li>GitHub에서 새 저장소(예: <code>my-web-index</code>)를 생성합니다.</li>
-        <li>이 코드를 <code>index.html</code> 파일로 저장한 뒤 저장소 루트에 업로드(<code>Add file &gt; Upload files</code>)합니다.</li>
-        <li>저장소의 <strong>Settings &gt; Pages</strong> 메뉴에서 <strong>Branch</strong>를 <code>main</code>, 폴더를 <code>/ (root)</code>로 선택하고 저장합니다.</li>
-        <li>잠시 후 <code>https://&lt;사용자명&gt;.github.io/&lt;저장소명&gt;/</code> 주소로 접속하면 최상단 INDEX가 열립니다.</li>
+        <li>이 코드를 저장소 루트의 <code>index.html</code>로 저장하고 GitHub에 업로드하면 최상단 INDEX와 게시판 리스트가 첫 화면에 표시됩니다.</li>
+        <li>게시판 행의 <code>./QR/</code>, <code>./GAME/</code> 링크는 저장소 내 각 폴더와 연결되므로, 별도 페이지를 분리해 둘 때도 함께 이동할 수 있습니다.</li>
+        <li>새 웹앱이나 게시물을 추가하려면 <code>#boardTbody</code>에 <code>&lt;tr&gt;</code> 항목 한 줄만 추가하면 검색·필터와 게시판 목록에 자동 반영됩니다.</li>
       </ol>
     </footer>
   </main>
@@ -668,19 +704,55 @@
   <canvas id="decodeCanvas" style="display: none;"></canvas>
 
   <script>
-    // [00] 최상단 INDEX 검색 필터
-    const indexSearch = document.getElementById("indexSearch");
-    const indexItems = Array.from(document.querySelectorAll("#indexGrid .index-item"));
+    // [00] & [01] 게시판 검색 및 분류 필터
+    const boardSearch = document.getElementById("boardSearch");
+    const pillBtns = Array.from(document.querySelectorAll(".pill-btn"));
+    const boardRows = Array.from(document.querySelectorAll("#boardTbody tr"));
+    let activeCat = "all";
 
-    indexSearch.addEventListener("input", (e) => {
-      const q = e.target.value.trim().toLowerCase();
-      indexItems.forEach((item) => {
-        const text = (item.textContent + " " + (item.dataset.keywords || "")).toLowerCase();
-        item.style.display = !q || text.includes(q) ? "flex" : "none";
+    function filterBoard() {
+      const query = boardSearch.value.trim().toLowerCase();
+      boardRows.forEach((row) => {
+        const cat = row.dataset.cat || "";
+        const text = (row.textContent + " " + (row.dataset.keywords || "")).toLowerCase();
+        const catMatch = activeCat === "all" || cat === activeCat;
+        const textMatch = !query || text.includes(query);
+        row.style.display = catMatch && textMatch ? "" : "none";
+      });
+    }
+
+    boardSearch.addEventListener("input", filterBoard);
+
+    pillBtns.forEach((btn) => {
+      btn.addEventListener("click", () => {
+        pillBtns.forEach((b) => b.classList.remove("active"));
+        btn.classList.add("active");
+        activeCat = btn.dataset.cat;
+        filterBoard();
       });
     });
 
-    // [01] QR 코드 자동 생성
+    // [02] QR 탭 전환
+    const qrTabGenBtn = document.getElementById("qrTabGenBtn");
+    const qrTabReadBtn = document.getElementById("qrTabReadBtn");
+    const qrPanelGen = document.getElementById("qrPanelGen");
+    const qrPanelRead = document.getElementById("qrPanelRead");
+
+    function openQrTab(mode) {
+      const isGen = mode === "generate";
+      qrTabGenBtn.classList.toggle("active", isGen);
+      qrTabGenBtn.setAttribute("aria-selected", String(isGen));
+      qrPanelGen.classList.toggle("active", isGen);
+
+      qrTabReadBtn.classList.toggle("active", !isGen);
+      qrTabReadBtn.setAttribute("aria-selected", String(!isGen));
+      qrPanelRead.classList.toggle("active", !isGen);
+    }
+
+    qrTabGenBtn.addEventListener("click", () => openQrTab("generate"));
+    qrTabReadBtn.addEventListener("click", () => openQrTab("read"));
+
+    // QR 자동 생성
     const linkInput = document.getElementById("linkInput");
     const qrCodeContainer = document.getElementById("qrCodeContainer");
     const qrPlaceholder = document.getElementById("qrPlaceholder");
@@ -703,8 +775,8 @@
 
       new QRCode(qrCodeContainer, {
         text: value,
-        width: 196,
-        height: 196,
+        width: 192,
+        height: 192,
         colorDark: "#0f172a",
         colorLight: "#ffffff",
         correctLevel: QRCode.CorrectLevel.M
@@ -732,7 +804,7 @@
       a.click();
     });
 
-    // [02] 이미지 업로드로 QR 링크 확인
+    // 이미지 업로드로 QR 읽기
     const dropzone = document.getElementById("dropzone");
     const fileInput = document.getElementById("fileInput");
     const uploadedPreviewWrap = document.getElementById("uploadedPreviewWrap");
@@ -842,73 +914,6 @@
         document.body.removeChild(temp);
       }
     });
-
-    // [03] 퀵 메모 저장
-    const quickNoteArea = document.getElementById("quickNoteArea");
-    const saveNoteBtn = document.getElementById("saveNoteBtn");
-    const clearNoteBtn = document.getElementById("clearNoteBtn");
-    const noteSaveStatus = document.getElementById("noteSaveStatus");
-    const NOTE_KEY = "github_index_hub_note_v1";
-
-    quickNoteArea.value = localStorage.getItem(NOTE_KEY) || "";
-
-    saveNoteBtn.addEventListener("click", () => {
-      localStorage.setItem(NOTE_KEY, quickNoteArea.value);
-      noteSaveStatus.textContent = "저장됨 (" + new Date().toLocaleTimeString("ko-KR") + ")";
-    });
-
-    clearNoteBtn.addEventListener("click", () => {
-      quickNoteArea.value = "";
-      localStorage.removeItem(NOTE_KEY);
-      noteSaveStatus.textContent = "메모를 비웠습니다.";
-    });
-
-    // [05] 텍스트·글자 수 카운터
-    const counterInput = document.getElementById("counterInput");
-    const statCharsWithSpace = document.getElementById("statCharsWithSpace");
-    const statCharsNoSpace = document.getElementById("statCharsNoSpace");
-    const statWords = document.getElementById("statWords");
-    const statLines = document.getElementById("statLines");
-    const copyCounterTextBtn = document.getElementById("copyCounterTextBtn");
-    const clearCounterBtn = document.getElementById("clearCounterBtn");
-    const counterStatus = document.getElementById("counterStatus");
-
-    function updateTextStats() {
-      const text = counterInput.value;
-      const withSpace = Array.from(text).length;
-      const noSpace = Array.from(text.replace(/\s+/g, "")).length;
-      const words = text.trim() ? text.trim().split(/\s+/).length : 0;
-      const lines = text.length ? text.split(/\r\n|\r|\n/).length : 0;
-
-      statCharsWithSpace.textContent = withSpace.toLocaleString("ko-KR");
-      statCharsNoSpace.textContent = noSpace.toLocaleString("ko-KR");
-      statWords.textContent = words.toLocaleString("ko-KR");
-      statLines.textContent = lines.toLocaleString("ko-KR");
-    }
-
-    counterInput.addEventListener("input", updateTextStats);
-
-    copyCounterTextBtn.addEventListener("click", async () => {
-      if (!counterInput.value) {
-        counterStatus.textContent = "복사할 텍스트가 없습니다.";
-        return;
-      }
-      try {
-        await navigator.clipboard.writeText(counterInput.value);
-        counterStatus.textContent = "텍스트가 클립보드에 복사되었습니다.";
-      } catch {
-        counterStatus.textContent = "복사 권한을 확인해 주세요.";
-      }
-    });
-
-    clearCounterBtn.addEventListener("click", () => {
-      counterInput.value = "";
-      updateTextStats();
-      counterStatus.textContent = "초기화되었습니다.";
-      counterInput.focus();
-    });
-
-    updateTextStats();
   </script>
 </body>
 </html>
