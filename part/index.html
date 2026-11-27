@@ -379,4 +379,507 @@
       <h1>🍱 구내식당 식수 예약 시스템</h1>
       <div class="tabs">
         <button class="tab-btn active" id="tabUser" type="button" onclick="switchTab('user')">신청자 화면</button>
-        <button class="tab-btn" id="tabAdmin" type="button" onclick="switchTab('
+        <button class="tab-btn" id="tabAdmin" type="button" onclick="switchTab('admin')">관리자 화면</button>
+      </div>
+    </header>
+
+    <div class="test-bar">
+      <div>
+        <strong>⏰ 접수 시간: 매일 10:00 ~ 12:00</strong>
+        <span id="timeStatusText" style="margin-left: 8px;"></span>
+      </div>
+      <label class="switch-wrap">
+        <span>테스트 모드 (시간제한 해제)</span>
+        <span class="switch">
+          <input type="checkbox" id="testModeToggle" checked onchange="renderAll()" />
+          <span class="slider"></span>
+        </span>
+      </label>
+    </div>
+
+    <!-- 신청자 화면 -->
+    <section id="userView">
+      <div class="card">
+        <div class="card-header">
+          <h2 style="font-size: 1.18rem;">오늘의 식수 현황 (<span id="todayDateLabel"></span>)</h2>
+          <span style="font-size: 0.85rem; color: var(--muted);">정원 150명 / 초과 시 자동 대기</span>
+        </div>
+
+        <div class="status-grid">
+          <div class="stat-box highlight">
+            <div class="label">확정 인원</div>
+            <div class="value"><span id="confirmedCount">0</span> / 150</div>
+          </div>
+          <div class="stat-box">
+            <div class="label">남은 자리</div>
+            <div class="value" id="remainingCount">150</div>
+          </div>
+          <div class="stat-box wait">
+            <div class="label">현재 대기</div>
+            <div class="value"><span id="waitlistCount">0</span>명</div>
+          </div>
+        </div>
+
+        <div class="progress-wrap">
+          <div class="progress-bar" id="capacityBar" style="width: 0%;"></div>
+        </div>
+
+        <div class="form-group">
+          <input type="text" id="userDept" placeholder="부서명 (예: 개발팀)" autocomplete="off" />
+          <input type="text" id="userName" placeholder="이름 (예: 홍길동)" autocomplete="off" />
+        </div>
+
+        <button class="btn btn-primary" id="reserveBtn" type="button" onclick="handleReserve()">식사 예약하기</button>
+        <p class="notice">
+          ※ 정원 150명 마감 후에는 '대기'로 등록되며, 확정자가 취소하면 대기 1번부터 자동 확정됩니다.<br />
+          ※ 취소 후 재신청 시 신청 시각 기준으로 맨 뒤 순번에 등록되며, 12시 이후 취소는 관리자에게 문의해 주세요.
+        </p>
+      </div>
+
+      <div class="card">
+        <h3 style="font-size: 1.08rem; margin-bottom: 10px;">🔍 내 예약 확인 및 취소</h3>
+        <input type="text" id="searchName" placeholder="신청한 이름을 입력하세요" oninput="renderMyReservation()" autocomplete="off" />
+        <div id="myReservationBox"></div>
+      </div>
+    </section>
+
+    <!-- 관리자 화면 -->
+    <section id="adminView" class="hidden">
+      <div class="card">
+        <div class="card-header" style="margin-bottom: 14px;">
+          <h2 style="font-size: 1.18rem;">📋 예약 명단 및 취소/대기 관리</h2>
+          <div class="toolbar">
+            <input type="date" id="adminDateFilter" onchange="renderAdminTable()" style="width: auto; padding: 7px 10px;" />
+            <button class="btn btn-outline btn-sm" type="button" onclick="copyListForExcel()">📋 명단 복사</button>
+            <button class="btn btn-outline btn-sm" type="button" onclick="exportCSV()">📥 CSV 다운로드</button>
+          </div>
+        </div>
+
+        <div style="background: var(--bg); padding: 12px; border-radius: 10px; margin-bottom: 14px; display: flex; gap: 8px; flex-wrap: wrap;">
+          <input type="text" id="adminAddDept" placeholder="부서명" style="flex: 1; min-width: 120px; padding: 8px 10px;" />
+          <input type="text" id="adminAddName" placeholder="이름 (전화/방문 대리등록)" style="flex: 1; min-width: 150px; padding: 8px 10px;" />
+          <button class="btn btn-primary btn-sm" type="button" onclick="adminAddReservation()">+ 대리 등록</button>
+        </div>
+
+        <div class="toolbar" style="margin-bottom: 10px;">
+          <button class="btn btn-outline btn-sm" type="button" onclick="setFilter('ALL')">전체</button>
+          <button class="btn btn-outline btn-sm" type="button" onclick="setFilter('CONFIRMED')">확정만</button>
+          <button class="btn btn-outline btn-sm" type="button" onclick="setFilter('WAITLIST')">대기만</button>
+          <button class="btn btn-outline btn-sm" type="button" onclick="setFilter('CANCELED')">취소내역</button>
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>순번</th>
+                <th>상태</th>
+                <th>부서</th>
+                <th>이름</th>
+                <th>신청시각</th>
+                <th>식사여부</th>
+                <th>관리</th>
+              </tr>
+            </thead>
+            <tbody id="adminTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    const MAX_CAPACITY = 150;
+    const ADMIN_PW = "1234";
+    const STORAGE_KEY = "cafeteria_reservations_v2";
+
+    let memoryFallback = [];
+    let isAdminAuthenticated = false;
+    let currentFilter = "ALL";
+
+    function getTodayStr() {
+      const now = new Date();
+      const offset = now.getTimezoneOffset() * 60000;
+      return new Date(now - offset).toISOString().split("T")[0];
+    }
+
+    function getReservations() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return [...memoryFallback];
+        const parsed = JSON.parse(raw);
+        return Array.isArray(parsed) ? parsed : [...memoryFallback];
+      } catch (e) {
+        return [...memoryFallback];
+      }
+    }
+
+    function saveReservations(data) {
+      memoryFallback = [...data];
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+      } catch (e) {
+        // 스토리지 제한 환경에서도 메모리 상태로 동작 유지
+      }
+    }
+
+    function isWithinBookingHours() {
+      const toggle = document.getElementById("testModeToggle");
+      if (toggle && toggle.checked) return true;
+      const hour = new Date().getHours();
+      return hour >= 10 && hour < 12;
+    }
+
+    function rebalanceQueue(dateStr) {
+      const all = getReservations();
+      const dayList = all.filter((r) => r.date === dateStr);
+      const otherList = all.filter((r) => r.date !== dateStr);
+
+      const active = dayList
+        .filter((r) => r.status !== "CANCELED")
+        .sort((a, b) => a.timestamp - b.timestamp);
+
+      const canceled = dayList.filter((r) => r.status === "CANCELED");
+
+      active.forEach((item, index) => {
+        if (index < MAX_CAPACITY) {
+          item.status = "CONFIRMED";
+          item.waitNumber = null;
+        } else {
+          item.status = "WAITLIST";
+          item.waitNumber = index - MAX_CAPACITY + 1;
+        }
+      });
+
+      saveReservations([...otherList, ...active, ...canceled]);
+    }
+
+    function handleReserve(customDept = null, customName = null, targetDate = null) {
+      const isAdminAction = customDept !== null;
+      if (!isAdminAction && !isWithinBookingHours()) {
+        alert("예약 가능 시간(오전 10:00 ~ 12:00)이 아닙니다.");
+        return;
+      }
+
+      const dept = (customDept ?? document.getElementById("userDept").value).trim();
+      const name = (customName ?? document.getElementById("userName").value).trim();
+      const dateStr = targetDate || getTodayStr();
+
+      if (!dept || !name) {
+        alert("부서명과 이름을 모두 입력해주세요.");
+        return;
+      }
+
+      const all = getReservations();
+      const activeDuplicate = all.find(
+        (r) => r.date === dateStr && r.dept === dept && r.name === name && r.status !== "CANCELED"
+      );
+      if (activeDuplicate) {
+        alert("이미 예약(또는 대기) 중인 내역이 있습니다.");
+        return;
+      }
+
+      const now = new Date();
+      const newEntry = {
+        id: `${Date.now()}_${Math.random().toString(36).slice(2, 7)}`,
+        date: dateStr,
+        dept,
+        name,
+        status: "CONFIRMED",
+        waitNumber: null,
+        timestamp: Date.now(),
+        timeStr: now.toLocaleTimeString("ko-KR", {
+          hour: "2-digit",
+          minute: "2-digit",
+          second: "2-digit"
+        }),
+        ate: false
+      };
+
+      all.push(newEntry);
+      saveReservations(all);
+      rebalanceQueue(dateStr);
+
+      const updated = getReservations().find((r) => r.id === newEntry.id);
+      if (updated && updated.status === "CONFIRMED") {
+        alert(`[${dept} ${name}] 식사 예약이 확정되었습니다.`);
+      } else if (updated) {
+        alert(`정원(150명)이 마감되어 [대기 ${updated.waitNumber}번]으로 등록되었습니다.`);
+      }
+
+      if (!isAdminAction) {
+        document.getElementById("searchName").value = name;
+        document.getElementById("userName").value = "";
+      }
+      renderAll();
+    }
+
+    function cancelReservation(id, byAdmin = false) {
+      if (!byAdmin && !isWithinBookingHours()) {
+        alert("본인 취소는 오전 10:00 ~ 12:00 사이에만 가능합니다. 이후에는 관리자에게 문의하세요.");
+        return;
+      }
+      if (!confirm("예약을 취소하시겠습니까? 취소 시 대기 순번이 자동으로 조정됩니다.")) {
+        return;
+      }
+
+      const all = getReservations();
+      const target = all.find((r) => r.id === id);
+      if (!target) return;
+
+      target.status = "CANCELED";
+      target.waitNumber = null;
+      target.ate = false;
+      saveReservations(all);
+
+      rebalanceQueue(target.date);
+      renderAll();
+    }
+
+    function restoreReservation(id) {
+      const all = getReservations();
+      const target = all.find((r) => r.id === id);
+      if (!target) return;
+
+      target.status = "CONFIRMED";
+      target.timestamp = Date.now();
+      saveReservations(all);
+      rebalanceQueue(target.date);
+      renderAll();
+    }
+
+    function toggleAte(id) {
+      const all = getReservations();
+      const target = all.find((r) => r.id === id);
+      if (target) {
+        target.ate = !target.ate;
+        saveReservations(all);
+        renderAdminTable();
+      }
+    }
+
+    function switchTab(tab) {
+      if (tab === "admin") {
+        if (!isAdminAuthenticated) {
+          const pw = prompt("관리자 비밀번호를 입력하세요 (초기 비밀번호: 1234)");
+          if (pw !== ADMIN_PW) {
+            alert("비밀번호가 일치하지 않습니다.");
+            return;
+          }
+          isAdminAuthenticated = true;
+        }
+        document.getElementById("userView").classList.add("hidden");
+        document.getElementById("adminView").classList.remove("hidden");
+        document.getElementById("tabAdmin").classList.add("active");
+        document.getElementById("tabUser").classList.remove("active");
+      } else {
+        document.getElementById("adminView").classList.add("hidden");
+        document.getElementById("userView").classList.remove("hidden");
+        document.getElementById("tabUser").classList.add("active");
+        document.getElementById("tabAdmin").classList.remove("active");
+      }
+      renderAll();
+    }
+
+    function adminAddReservation() {
+      const dept = document.getElementById("adminAddDept").value;
+      const name = document.getElementById("adminAddName").value;
+      const dateStr = document.getElementById("adminDateFilter").value || getTodayStr();
+      handleReserve(dept, name, dateStr);
+      document.getElementById("adminAddDept").value = "";
+      document.getElementById("adminAddName").value = "";
+    }
+
+    function setFilter(filter) {
+      currentFilter = filter;
+      renderAdminTable();
+    }
+
+    function renderAll() {
+      const today = getTodayStr();
+      document.getElementById("todayDateLabel").textContent = today;
+      const dateInput = document.getElementById("adminDateFilter");
+      if (!dateInput.value) {
+        dateInput.value = today;
+      }
+
+      const canBook = isWithinBookingHours();
+      const timeStatus = document.getElementById("timeStatusText");
+      const reserveBtn = document.getElementById("reserveBtn");
+
+      const todayList = getReservations().filter((r) => r.date === today);
+      const confirmed = todayList.filter((r) => r.status === "CONFIRMED");
+      const waitlist = todayList.filter((r) => r.status === "WAITLIST");
+
+      document.getElementById("confirmedCount").textContent = confirmed.length;
+      document.getElementById("remainingCount").textContent = Math.max(0, MAX_CAPACITY - confirmed.length);
+      document.getElementById("waitlistCount").textContent = waitlist.length;
+
+      const percent = Math.min(100, (confirmed.length / MAX_CAPACITY) * 100);
+      const bar = document.getElementById("capacityBar");
+      bar.style.width = `${percent}%`;
+      bar.classList.toggle("full", confirmed.length >= MAX_CAPACITY);
+
+      if (canBook) {
+        timeStatus.innerHTML = `<span style="color: var(--success); font-weight: 700;">● 접수 중</span>`;
+        reserveBtn.disabled = false;
+        if (confirmed.length >= MAX_CAPACITY) {
+          reserveBtn.textContent = `정원 마감 - 대기 신청하기 (현재 대기 ${waitlist.length}명)`;
+          reserveBtn.className = "btn btn-warning";
+        } else {
+          reserveBtn.textContent = "식사 예약하기";
+          reserveBtn.className = "btn btn-primary";
+        }
+      } else {
+        timeStatus.innerHTML = `<span style="color: var(--danger); font-weight: 700;">● 접수 마감 (10:00 ~ 12:00)</span>`;
+        reserveBtn.disabled = true;
+        reserveBtn.textContent = "예약 가능 시간이 아닙니다 (10:00 ~ 12:00)";
+        reserveBtn.className = "btn";
+      }
+
+      renderMyReservation();
+      renderAdminTable();
+    }
+
+    function renderMyReservation() {
+      const keyword = document.getElementById("searchName").value.trim();
+      const box = document.getElementById("myReservationBox");
+      if (!keyword) {
+        box.innerHTML = "";
+        return;
+      }
+
+      const today = getTodayStr();
+      const matches = getReservations().filter(
+        (r) => r.date === today && r.name.includes(keyword) && r.status !== "CANCELED"
+      );
+
+      if (matches.length === 0) {
+        box.innerHTML = `<p class="notice">오늘 날짜로 조회된 예약/대기 내역이 없습니다.</p>`;
+        return;
+      }
+
+      box.innerHTML = matches
+        .map(
+          (r) => `
+          <div class="my-ticket">
+            <div>
+              <strong>${r.dept} ${r.name}</strong>
+              <div style="margin-top: 4px;">
+                ${
+                  r.status === "CONFIRMED"
+                    ? `<span class="badge badge-confirmed">예약 확정</span>`
+                    : `<span class="badge badge-waitlist">대기 ${r.waitNumber}번</span>`
+                }
+                <span style="font-size: 0.8rem; color: var(--muted); margin-left: 6px;">신청: ${r.timeStr}</span>
+              </div>
+            </div>
+            <button class="btn btn-danger btn-sm" type="button" onclick="cancelReservation('${r.id}', false)">예약 취소</button>
+          </div>
+        `
+        )
+        .join("");
+    }
+
+    function renderAdminTable() {
+      const dateStr = document.getElementById("adminDateFilter").value || getTodayStr();
+      let list = getReservations()
+        .filter((r) => r.date === dateStr)
+        .sort((a, b) => a.timestamp - b.timestamp);
+
+      if (currentFilter !== "ALL") {
+        list = list.filter((r) => r.status === currentFilter);
+      }
+
+      const tbody = document.getElementById("adminTableBody");
+      if (list.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: var(--muted); padding: 24px;">데이터가 없습니다.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = list
+        .map((r, idx) => {
+          let badge = "";
+          if (r.status === "CONFIRMED") badge = `<span class="badge badge-confirmed">확정</span>`;
+          else if (r.status === "WAITLIST") badge = `<span class="badge badge-waitlist">대기 ${r.waitNumber}번</span>`;
+          else badge = `<span class="badge badge-canceled">취소됨</span>`;
+
+          return `
+            <tr>
+              <td>${idx + 1}</td>
+              <td>${badge}</td>
+              <td>${r.dept}</td>
+              <td><strong>${r.name}</strong></td>
+              <td>${r.timeStr}</td>
+              <td>
+                ${
+                  r.status === "CONFIRMED"
+                    ? `<input type="checkbox" ${r.ate ? "checked" : ""} onchange="toggleAte('${r.id}')" />`
+                    : "-"
+                }
+              </td>
+              <td>
+                ${
+                  r.status !== "CANCELED"
+                    ? `<button class="btn btn-danger btn-sm" type="button" onclick="cancelReservation('${r.id}', true)">취소</button>`
+                    : `<button class="btn btn-outline btn-sm" type="button" onclick="restoreReservation('${r.id}')">복구</button>`
+                }
+              </td>
+            </tr>
+          `;
+        })
+        .join("");
+    }
+
+    function buildRowsForDate(dateStr) {
+      return getReservations()
+        .filter((r) => r.date === dateStr)
+        .sort((a, b) => a.timestamp - b.timestamp);
+    }
+
+    function copyListForExcel() {
+      const dateStr = document.getElementById("adminDateFilter").value || getTodayStr();
+      const list = buildRowsForDate(dateStr);
+      if (list.length === 0) {
+        alert("복사할 데이터가 없습니다.");
+        return;
+      }
+
+      const lines = ["날짜\t상태\t대기순번\t부서\t이름\t신청시각\t식사여부"];
+      list.forEach((r) => {
+        const statusKo = r.status === "CONFIRMED" ? "확정" : r.status === "WAITLIST" ? "대기" : "취소";
+        lines.push(`${r.date}\t${statusKo}\t${r.waitNumber || ""}\t${r.dept}\t${r.name}\t${r.timeStr}\t${r.ate ? "O" : "X"}`);
+      });
+
+      navigator.clipboard
+        .writeText(lines.join("\n"))
+        .then(() => alert("명단이 복사되었습니다. 엑셀에 바로 붙여넣기(Ctrl+V) 하세요."))
+        .catch(() => alert("클립보드 복사에 실패했습니다. CSV 다운로드를 이용해 주세요."));
+    }
+
+    function exportCSV() {
+      const dateStr = document.getElementById("adminDateFilter").value || getTodayStr();
+      const list = buildRowsForDate(dateStr);
+      if (list.length === 0) {
+        alert("다운로드할 데이터가 없습니다.");
+        return;
+      }
+
+      let csv = "\uFEFF날짜,상태,대기순번,부서,이름,신청시각,식사여부\n";
+      list.forEach((r) => {
+        const statusKo = r.status === "CONFIRMED" ? "확정" : r.status === "WAITLIST" ? "대기" : "취소";
+        csv += `${r.date},${statusKo},${r.waitNumber || ""},${r.dept},${r.name},${r.timeStr},${r.ate ? "O" : "X"}\n`;
+      });
+
+      const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = `구내식당_예약명단_${dateStr}.csv`;
+      link.click();
+    }
+
+    renderAll();
+    setInterval(renderAll, 10000);
+  </script>
+</body>
+</html>
