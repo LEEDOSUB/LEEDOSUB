@@ -1,0 +1,787 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>최상단 INDEX · 웹앱 허브 (라이트 테마)</title>
+  <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
+  <style>
+    :root {
+      --bg: #f4f6f9;
+      --surface: #ffffff;
+      --surface-2: #f8fafc;
+      --text: #0f172a;
+      --muted: #475569;
+      --accent: #0284c7;
+      --accent-hover: #0369a1;
+      --accent-soft: #e0f2fe;
+      --success: #15803d;
+      --error: #dc2626;
+      --border: #e2e8f0;
+      --shadow: 0 4px 16px rgba(15, 23, 42, 0.05);
+      --radius: 14px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans KR", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      padding: 24px 16px 60px;
+    }
+
+    .app {
+      max-width: 920px;
+      margin: 0 auto;
+      display: grid;
+      gap: 20px;
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 22px;
+      box-shadow: var(--shadow);
+    }
+
+    /* [00] 최상단 INDEX 헤더 */
+    .index-header {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 14px;
+      margin-bottom: 16px;
+    }
+
+    .index-title {
+      font-size: 1.5rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      color: var(--text);
+    }
+
+    .index-sub {
+      color: var(--muted);
+      font-size: 0.92rem;
+      margin-top: 4px;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: var(--accent-hover);
+      background: var(--accent-soft);
+      border: 1px solid #bae6fd;
+      padding: 6px 11px;
+      border-radius: 999px;
+    }
+
+    .quick-nav {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 18px;
+    }
+
+    .quick-nav a {
+      text-decoration: none;
+      color: var(--text);
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-size: 0.84rem;
+      font-weight: 600;
+      transition: border-color 0.18s ease, color 0.18s ease, background 0.18s ease;
+    }
+
+    .quick-nav a:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+      background: var(--accent-soft);
+    }
+
+    .search-row {
+      margin-bottom: 16px;
+    }
+
+    input[type="search"],
+    input[type="url"],
+    input[type="text"],
+    textarea {
+      width: 100%;
+      padding: 11px 14px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: var(--surface-2);
+      color: var(--text);
+      font-size: 0.94rem;
+      outline: none;
+      font-family: inherit;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    input:focus,
+    textarea:focus {
+      border-color: var(--accent);
+      background: var(--surface);
+      box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.12);
+    }
+
+    /* INDEX 모듈 카드 그리드 */
+    .index-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 12px;
+    }
+
+    .index-item {
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 10px;
+      transition: transform 0.15s ease, border-color 0.18s ease, box-shadow 0.18s ease;
+    }
+
+    .index-item:hover {
+      transform: translateY(-2px);
+      border-color: var(--accent);
+      background: var(--surface);
+      box-shadow: 0 6px 18px rgba(2, 132, 199, 0.08);
+    }
+
+    .index-item-code {
+      font-size: 0.76rem;
+      font-weight: 700;
+      color: var(--accent);
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    }
+
+    .index-item-title {
+      font-size: 1rem;
+      font-weight: 700;
+      margin-top: 2px;
+      color: var(--text);
+    }
+
+    .index-item-desc {
+      font-size: 0.85rem;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+
+    .index-item-actions {
+      display: flex;
+      gap: 8px;
+      margin-top: 4px;
+    }
+
+    .btn {
+      background: var(--accent);
+      color: #ffffff;
+      border: none;
+      padding: 9px 14px;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 0.86rem;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.15s ease;
+    }
+
+    .btn:hover:not(:disabled) {
+      background: var(--accent-hover);
+    }
+
+    .btn:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+
+    .btn-sm {
+      padding: 6px 11px;
+      font-size: 0.8rem;
+    }
+
+    .btn-secondary {
+      background: var(--surface);
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+
+    .btn-secondary:hover:not(:disabled) {
+      border-color: var(--accent);
+      color: var(--accent);
+      background: var(--surface-2);
+    }
+
+    /* 섹션 공통 */
+    .section-head {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 14px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .section-code {
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 0.82rem;
+      color: var(--accent);
+      font-weight: 700;
+    }
+
+    h2 {
+      font-size: 1.18rem;
+      color: var(--text);
+    }
+
+    .desc {
+      color: var(--muted);
+      font-size: 0.9rem;
+      margin-bottom: 14px;
+    }
+
+    label {
+      display: block;
+      font-size: 0.88rem;
+      font-weight: 600;
+      margin-bottom: 6px;
+      color: var(--text);
+    }
+
+    .controls-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 12px;
+      align-items: center;
+    }
+
+    .qr-preview-box {
+      margin-top: 16px;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+      min-height: 230px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+    }
+
+    #qrCodeContainer {
+      background: #ffffff;
+      padding: 14px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .placeholder-text {
+      color: var(--muted);
+      font-size: 0.9rem;
+      text-align: center;
+    }
+
+    .dropzone {
+      border: 2px dashed #cbd5e1;
+      border-radius: 12px;
+      padding: 24px 16px;
+      text-align: center;
+      background: var(--surface-2);
+      cursor: pointer;
+      transition: border-color 0.18s ease, background 0.18s ease;
+    }
+
+    .dropzone:hover,
+    .dropzone.dragover {
+      border-color: var(--accent);
+      background: var(--accent-soft);
+    }
+
+    .dropzone p {
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    .dropzone strong {
+      color: var(--accent-hover);
+    }
+
+    #fileInput {
+      display: none;
+    }
+
+    .uploaded-preview-wrap {
+      margin-top: 14px;
+      display: none;
+      justify-content: center;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px;
+    }
+
+    .uploaded-preview-wrap.visible {
+      display: flex;
+    }
+
+    #uploadedPreview {
+      max-width: 100%;
+      max-height: 220px;
+      border-radius: 8px;
+      object-fit: contain;
+    }
+
+    .result-box {
+      margin-top: 14px;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px;
+    }
+
+    .result-status {
+      font-size: 0.85rem;
+      font-weight: 700;
+      margin-bottom: 6px;
+      color: var(--muted);
+    }
+
+    .result-status.ok {
+      color: var(--success);
+    }
+
+    .result-status.err {
+      color: var(--error);
+    }
+
+    .decoded-link {
+      word-break: break-all;
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 0.9rem;
+      color: var(--accent-hover);
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .decoded-link:hover {
+      text-decoration: underline;
+    }
+
+    .guide-list {
+      padding-left: 18px;
+      color: var(--muted);
+      font-size: 0.9rem;
+      display: grid;
+      gap: 8px;
+    }
+
+    .guide-list code {
+      color: var(--text);
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      padding: 2px 6px;
+      border-radius: 5px;
+    }
+
+    .save-note {
+      font-size: 0.82rem;
+      color: var(--muted);
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <!-- [00] 최상단 INDEX 허브 -->
+    <header id="top-index" class="card">
+      <div class="index-header">
+        <div>
+          <h1 class="index-title">INDEX · 개인 웹앱 허브</h1>
+          <p class="index-sub">GitHub Pages 단일 파일 배포용 최상단 인덱스 — 원하는 기능으로 바로 이동하거나 검색하세요.</p>
+        </div>
+        <span class="badge">Light Mode · index.html</span>
+      </div>
+
+      <nav class="quick-nav" aria-label="최상단 인덱스 바로가기">
+        <a href="#top-index">[00] 최상단 INDEX</a>
+        <a href="#module-qr-gen">[01] QR 생성</a>
+        <a href="#module-qr-read">[02] QR 읽기</a>
+        <a href="#module-notes">[03] 퀵 메모</a>
+        <a href="#deploy-guide">[04] GitHub 배포</a>
+      </nav>
+
+      <div class="search-row">
+        <label for="indexSearch">INDEX 모듈 검색</label>
+        <input
+          id="indexSearch"
+          type="search"
+          placeholder="예: QR, 생성, 읽기, 메모, 배포..."
+          autocomplete="off"
+        />
+      </div>
+
+      <div id="indexGrid" class="index-grid">
+        <article class="index-item" data-keywords="01 qr 생성 링크 url png 다운로드">
+          <div>
+            <div class="index-item-code">INDEX-01</div>
+            <div class="index-item-title">QR 코드 자동 생성</div>
+            <p class="index-item-desc">링크를 입력하면 QR 코드를 즉시 만들고 PNG로 저장합니다.</p>
+          </div>
+          <div class="index-item-actions">
+            <a class="btn btn-sm" href="#module-qr-gen">열기</a>
+          </div>
+        </article>
+
+        <article class="index-item" data-keywords="02 qr 읽기 이미지 업로드 링크 추출 복사">
+          <div>
+            <div class="index-item-code">INDEX-02</div>
+            <div class="index-item-title">QR 이미지 판독</div>
+            <p class="index-item-desc">이미지를 업로드해 QR 코드 속 링크를 읽고 복사합니다.</p>
+          </div>
+          <div class="index-item-actions">
+            <a class="btn btn-sm" href="#module-qr-read">열기</a>
+          </div>
+        </article>
+
+        <article class="index-item" data-keywords="03 메모 노트 기록 저장">
+          <div>
+            <div class="index-item-code">INDEX-03</div>
+            <div class="index-item-title">퀵 메모장</div>
+            <p class="index-item-desc">아이디어와 작업 메모를 브라우저 저장소에 보관합니다.</p>
+          </div>
+          <div class="index-item-actions">
+            <a class="btn btn-sm" href="#module-notes">열기</a>
+          </div>
+        </article>
+
+        <article class="index-item" data-keywords="04 깃허브 github pages 배포 업로드">
+          <div>
+            <div class="index-item-code">INDEX-04</div>
+            <div class="index-item-title">GitHub Pages 배포</div>
+            <p class="index-item-desc">저장소에 index.html을 올리고 웹 주소로 공개하는 절차입니다.</p>
+          </div>
+          <div class="index-item-actions">
+            <a class="btn btn-sm btn-secondary" href="#deploy-guide">가이드 보기</a>
+          </div>
+        </article>
+      </div>
+    </header>
+
+    <!-- [01] QR 생성 -->
+    <section id="module-qr-gen" class="card">
+      <div class="section-head">
+        <h2>QR 코드 자동 생성</h2>
+        <span class="section-code">INDEX-01 · #module-qr-gen</span>
+      </div>
+      <p class="desc">링크(URL) 또는 텍스트를 입력하면 QR 코드가 자동으로 생성됩니다.</p>
+
+      <label for="linkInput">링크(URL) 입력</label>
+      <input id="linkInput" type="url" placeholder="예: https://github.com" autocomplete="off" />
+
+      <div class="controls-row">
+        <button id="downloadQrBtn" class="btn" type="button" disabled>PNG 다운로드</button>
+        <button id="clearQrBtn" class="btn btn-secondary" type="button">초기화</button>
+        <a class="btn btn-secondary" href="#top-index">최상단 INDEX로</a>
+      </div>
+
+      <div class="qr-preview-box">
+        <div id="qrCodeContainer" style="display: none;"></div>
+        <p id="qrPlaceholder" class="placeholder-text">링크를 입력하면 여기에 QR 코드가 표시됩니다.</p>
+      </div>
+    </section>
+
+    <!-- [02] QR 읽기 -->
+    <section id="module-qr-read" class="card">
+      <div class="section-head">
+        <h2>이미지 업로드로 QR 링크 확인</h2>
+        <span class="section-code">INDEX-02 · #module-qr-read</span>
+      </div>
+      <p class="desc">QR 코드 이미지를 선택하거나 끌어다 놓으면 포함된 링크를 보여줍니다.</p>
+
+      <div id="dropzone" class="dropzone" tabindex="0" role="button" aria-label="QR 이미지 업로드">
+        <p><strong>이미지를 클릭해 선택</strong>하거나 여기에 드래그하세요 (PNG, JPG, WEBP)</p>
+      </div>
+      <input id="fileInput" type="file" accept="image/*" />
+
+      <div id="uploadedPreviewWrap" class="uploaded-preview-wrap">
+        <img id="uploadedPreview" alt="업로드된 QR 이미지" />
+      </div>
+
+      <div class="result-box">
+        <div id="readStatus" class="result-status">대기 중 · 이미지를 업로드해 주세요.</div>
+        <div id="decodedOutput">
+          <span class="placeholder-text">추출된 링크가 여기에 표시됩니다.</span>
+        </div>
+        <div class="controls-row">
+          <button id="copyDecodedBtn" class="btn btn-secondary" type="button" disabled>링크 복사</button>
+          <a id="openDecodedLink" class="btn" href="#" target="_blank" rel="noopener noreferrer" style="display: none;">링크 열기</a>
+          <a class="btn btn-secondary" href="#top-index">최상단 INDEX로</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- [03] 퀵 메모 -->
+    <section id="module-notes" class="card">
+      <div class="section-head">
+        <h2>퀵 메모장</h2>
+        <span class="section-code">INDEX-03 · #module-notes</span>
+      </div>
+      <p class="desc">다음에 추가할 기능 아이디어나 메모를 적어두세요. (브라우저 localStorage에 자동 저장)</p>
+
+      <label for="quickNoteArea">작업 메모</label>
+      <textarea id="quickNoteArea" rows="4" placeholder="예: 다음 기능으로 색상 커스텀 QR 옵션 추가하기"></textarea>
+
+      <div class="controls-row">
+        <button id="saveNoteBtn" class="btn" type="button">메모 저장</button>
+        <button id="clearNoteBtn" class="btn btn-secondary" type="button">메모 비우기</button>
+        <span id="noteSaveStatus" class="save-note"></span>
+      </div>
+    </section>
+
+    <!-- [04] GitHub Pages 배포 안내 -->
+    <footer id="deploy-guide" class="card">
+      <div class="section-head">
+        <h2>GitHub Pages 배포 절차</h2>
+        <span class="section-code">INDEX-04 · #deploy-guide</span>
+      </div>
+      <ol class="guide-list">
+        <li>GitHub에서 새 저장소(예: <code>my-web-index</code>)를 생성합니다.</li>
+        <li>이 코드를 <code>index.html</code> 파일로 저장한 뒤 저장소 루트에 업로드(<code>Add file &gt; Upload files</code>)합니다.</li>
+        <li>저장소의 <strong>Settings &gt; Pages</strong> 메뉴에서 <strong>Branch</strong>를 <code>main</code>, 폴더를 <code>/ (root)</code>로 선택하고 저장합니다.</li>
+        <li>잠시 후 <code>https://&lt;사용자명&gt;.github.io/&lt;저장소명&gt;/</code> 주소로 접속하면 최상단 INDEX가 열립니다.</li>
+      </ol>
+    </footer>
+  </main>
+
+  <canvas id="decodeCanvas" style="display: none;"></canvas>
+
+  <script>
+    // [00] 최상단 INDEX 검색 필터
+    const indexSearch = document.getElementById("indexSearch");
+    const indexItems = Array.from(document.querySelectorAll("#indexGrid .index-item"));
+
+    indexSearch.addEventListener("input", (e) => {
+      const q = e.target.value.trim().toLowerCase();
+      indexItems.forEach((item) => {
+        const text = (item.textContent + " " + (item.dataset.keywords || "")).toLowerCase();
+        item.style.display = !q || text.includes(q) ? "flex" : "none";
+      });
+    });
+
+    // [01] QR 코드 자동 생성
+    const linkInput = document.getElementById("linkInput");
+    const qrCodeContainer = document.getElementById("qrCodeContainer");
+    const qrPlaceholder = document.getElementById("qrPlaceholder");
+    const downloadQrBtn = document.getElementById("downloadQrBtn");
+    const clearQrBtn = document.getElementById("clearQrBtn");
+
+    function renderQRCode(rawValue) {
+      const value = rawValue.trim();
+      qrCodeContainer.innerHTML = "";
+
+      if (!value) {
+        qrCodeContainer.style.display = "none";
+        qrPlaceholder.style.display = "block";
+        downloadQrBtn.disabled = true;
+        return;
+      }
+
+      qrPlaceholder.style.display = "none";
+      qrCodeContainer.style.display = "inline-flex";
+
+      new QRCode(qrCodeContainer, {
+        text: value,
+        width: 196,
+        height: 196,
+        colorDark: "#0f172a",
+        colorLight: "#ffffff",
+        correctLevel: QRCode.CorrectLevel.M
+      });
+
+      downloadQrBtn.disabled = false;
+    }
+
+    linkInput.addEventListener("input", (e) => renderQRCode(e.target.value));
+
+    clearQrBtn.addEventListener("click", () => {
+      linkInput.value = "";
+      renderQRCode("");
+      linkInput.focus();
+    });
+
+    downloadQrBtn.addEventListener("click", () => {
+      const canvas = qrCodeContainer.querySelector("canvas");
+      const img = qrCodeContainer.querySelector("img");
+      const dataUrl = canvas ? canvas.toDataURL("image/png") : (img && img.src ? img.src : "");
+      if (!dataUrl) return;
+      const a = document.createElement("a");
+      a.href = dataUrl;
+      a.download = "qrcode.png";
+      a.click();
+    });
+
+    // [02] 이미지 업로드로 QR 링크 확인
+    const dropzone = document.getElementById("dropzone");
+    const fileInput = document.getElementById("fileInput");
+    const uploadedPreviewWrap = document.getElementById("uploadedPreviewWrap");
+    const uploadedPreview = document.getElementById("uploadedPreview");
+    const decodeCanvas = document.getElementById("decodeCanvas");
+    const readStatus = document.getElementById("readStatus");
+    const decodedOutput = document.getElementById("decodedOutput");
+    const copyDecodedBtn = document.getElementById("copyDecodedBtn");
+    const openDecodedLink = document.getElementById("openDecodedLink");
+    let currentDecodedText = "";
+
+    function isValidHttpUrl(text) {
+      try {
+        const parsed = new URL(text);
+        return parsed.protocol === "http:" || parsed.protocol === "https:";
+      } catch {
+        return false;
+      }
+    }
+
+    function decodeImageFile(file) {
+      if (!file || !file.type.startsWith("image/")) {
+        readStatus.textContent = "오류 · 이미지 파일만 지원합니다.";
+        readStatus.className = "result-status err";
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const img = new Image();
+        img.onload = () => {
+          uploadedPreview.src = event.target.result;
+          uploadedPreviewWrap.classList.add("visible");
+
+          const ctx = decodeCanvas.getContext("2d", { willReadFrequently: true });
+          decodeCanvas.width = img.naturalWidth;
+          decodeCanvas.height = img.naturalHeight;
+          ctx.drawImage(img, 0, 0);
+
+          const imageData = ctx.getImageData(0, 0, decodeCanvas.width, decodeCanvas.height);
+          const code = jsQR(imageData.data, imageData.width, imageData.height, {
+            inversionAttempts: "attemptBoth"
+          });
+
+          if (code && code.data) {
+            currentDecodedText = code.data;
+            readStatus.textContent = "인식 성공 · QR 코드에서 링크를 추출했습니다.";
+            readStatus.className = "result-status ok";
+
+            if (isValidHttpUrl(currentDecodedText)) {
+              decodedOutput.innerHTML = `<a class="decoded-link" href="${encodeURI(currentDecodedText)}" target="_blank" rel="noopener noreferrer">${currentDecodedText}</a>`;
+              openDecodedLink.href = encodeURI(currentDecodedText);
+              openDecodedLink.style.display = "inline-flex";
+            } else {
+              decodedOutput.innerHTML = `<span class="decoded-link">${currentDecodedText}</span>`;
+              openDecodedLink.style.display = "none";
+            }
+            copyDecodedBtn.disabled = false;
+          } else {
+            currentDecodedText = "";
+            readStatus.textContent = "인식 실패 · 이미지에서 QR 코드를 찾지 못했습니다.";
+            readStatus.className = "result-status err";
+            decodedOutput.innerHTML = `<span class="placeholder-text">추출된 링크가 없습니다.</span>`;
+            copyDecodedBtn.disabled = true;
+            openDecodedLink.style.display = "none";
+          }
+        };
+        img.src = event.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    dropzone.addEventListener("click", () => fileInput.click());
+    dropzone.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        fileInput.click();
+      }
+    });
+    fileInput.addEventListener("change", (e) => {
+      if (e.target.files && e.target.files[0]) decodeImageFile(e.target.files[0]);
+    });
+    dropzone.addEventListener("dragover", (e) => {
+      e.preventDefault();
+      dropzone.classList.add("dragover");
+    });
+    dropzone.addEventListener("dragleave", () => dropzone.classList.remove("dragover"));
+    dropzone.addEventListener("drop", (e) => {
+      e.preventDefault();
+      dropzone.classList.remove("dragover");
+      const file = e.dataTransfer.files && e.dataTransfer.files[0];
+      if (file) decodeImageFile(file);
+    });
+
+    copyDecodedBtn.addEventListener("click", async () => {
+      if (!currentDecodedText) return;
+      try {
+        await navigator.clipboard.writeText(currentDecodedText);
+        copyDecodedBtn.textContent = "복사 완료";
+        setTimeout(() => { copyDecodedBtn.textContent = "링크 복사"; }, 1400);
+      } catch {
+        const temp = document.createElement("input");
+        temp.value = currentDecodedText;
+        document.body.appendChild(temp);
+        temp.select();
+        document.execCommand("copy");
+        document.body.removeChild(temp);
+      }
+    });
+
+    // [03] 퀵 메모 저장
+    const quickNoteArea = document.getElementById("quickNoteArea");
+    const saveNoteBtn = document.getElementById("saveNoteBtn");
+    const clearNoteBtn = document.getElementById("clearNoteBtn");
+    const noteSaveStatus = document.getElementById("noteSaveStatus");
+    const NOTE_KEY = "github_index_hub_note_v1";
+
+    quickNoteArea.value = localStorage.getItem(NOTE_KEY) || "";
+
+    saveNoteBtn.addEventListener("click", () => {
+      localStorage.setItem(NOTE_KEY, quickNoteArea.value);
+      noteSaveStatus.textContent = "저장됨 (" + new Date().toLocaleTimeString("ko-KR") + ")";
+    });
+
+    clearNoteBtn.addEventListener("click", () => {
+      quickNoteArea.value = "";
+      localStorage.removeItem(NOTE_KEY);
+      noteSaveStatus.textContent = "메모를 비웠습니다.";
+    });
+  </script>
+</body>
+</html>
